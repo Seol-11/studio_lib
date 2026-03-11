@@ -1,0 +1,115 @@
+---
+// Server-side Logic: 최상위 라우터이므로 별도의 Layout이나 Component를 상속받지 않고 독립적으로 구동시킵니다.
+---
+
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Studio.lib | System Router</title>
+    <style>
+        /* [1. Global Reset & Typography] */
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+KR:wght@400;700&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #F4EBD0; /* 빈티지 아이보리 */
+            color: #4A3F35; /* 에스프레소 브라운 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Noto Serif KR', serif; /* 아날로그 감성 명조체 베이스 */
+        }
+
+        /* [2. Main Router Container] */
+        .hub-container {
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* [3. Header Branding] */
+        .brand-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            letter-spacing: -1px;
+        }
+
+        .brand-subtitle {
+            font-family: 'JetBrains Mono', monospace; /* 디지털 설계 감성의 모노스페이스 */
+            font-size: 0.9rem;
+            color: #8C6F56;
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* [4. Navigation Multiplexer (MUX)] */
+        .nav-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .nav-button {
+            display: block;
+            padding: 1.2rem;
+            text-decoration: none;
+            color: #4A3F35;
+            border: 1px solid #E0D5B7;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-button:hover {
+            background-color: #4A3F35;
+            color: #F4EBD0;
+            border-color: #4A3F35;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 63, 53, 0.15);
+        }
+
+        .nav-button span {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hub-container">
+        <h1 class="brand-title">Studio.lib</h1>
+        <p class="brand-subtitle">Digital Logic & Analog Log</p>
+
+        <nav class="nav-grid">
+            <a href="/cv" class="nav-button">
+                <span>[00]</span> CV & Portfolio
+            </a>
+            
+            <a href="/silicon" class="nav-button">
+                <span>[01]</span> Silicon Archive (Tech)
+            </a>
+            
+            <a href="/archive" class="nav-button">
+                <span>[10]</span> Analog Log (Life)
+            </a>
+            
+            <a href="https://github.com/당신의깃허브아이디" target="_blank" class="nav-button">
+                <span>[11]</span> GitHub Repository
+            </a>
+        </nav>
+    </div>
+
+</body>
+</html>
+

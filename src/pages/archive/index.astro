@@ -1,0 +1,117 @@
+---
+// Server-side Logic: 디렉토리 내의 데이터 패스 탐색
+// Astro.glob() 함수를 이용해 이 폴더 안의 모든 .md 파일을 메모리로 끌어옵니다.
+const posts = await Astro.glob('./*.md');
+
+// 날짜(Date) 기준으로 내림차순(최신순) 정렬하는 로직입니다.
+posts.sort((a, b) => new Date(b.frontmatter.date).valueOf() - new Date(a.frontmatter.date).valueOf());
+---
+
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analog Log | Studio.lib</title>
+    <style>
+        /* [1. Vintage Typography] */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #F4EBD0; /* 상아색 바탕 */
+            color: #4A3F35;
+            font-family: 'Noto Serif KR', serif;
+        }
+
+        /* [2. Layout] */
+        .archive-container {
+            max-width: 600px;
+            margin: 5rem auto;
+            padding: 0 2rem;
+        }
+
+        .nav-back {
+            display: inline-block;
+            color: #8C6F56;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-style: italic;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-back:hover {
+            color: #4A3F35;
+            border-bottom-color: #4A3F35;
+        }
+
+        /* [3. Header] */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2C2621;
+        }
+
+        .description {
+            color: #8C6F56;
+            margin-bottom: 4rem;
+            font-size: 1rem;
+        }
+
+        /* [4. Post List] */
+        .post-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .post-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 1rem 0;
+            border-bottom: 1px solid #E0D5B7;
+            transition: transform 0.2s ease;
+        }
+
+        .post-item:hover {
+            transform: translateX(5px); /* 마우스 오버 시 살짝 우측으로 밀리는 타격감 */
+        }
+
+        .post-link {
+            text-decoration: none;
+            color: #4A3F35;
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .post-date {
+            font-size: 0.9rem;
+            color: #8C6F56;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="archive-container">
+        <a href="/" class="nav-back">← Back to the Hub</a>
+
+        <h1>Analog Log</h1>
+        <p class="description">디지털 신호가 닿지 않는 아날로그의 기록들.</p>
+
+        <ul class="post-list">
+            {posts.map((post) => (
+                <li class="post-item">
+                    <a href={post.url} class="post-link">{post.frontmatter.title}</a>
+                    <span class="post-date">{post.frontmatter.date}</span>
+                </li>
+            ))}
+        </ul>
+    </div>
+
+</body>
+</html>

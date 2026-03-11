@@ -1,0 +1,134 @@
+---
+// Server-side Logic: 디렉토리 내의 기술 문서(.md) 패치 및 정렬
+const posts = await Astro.glob('./*.md');
+posts.sort((a, b) => new Date(b.frontmatter.date).valueOf() - new Date(a.frontmatter.date).valueOf());
+---
+
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silicon Archive | Studio.lib</title>
+    <style>
+        /* [1. IDE / Terminal Typography] */
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #0D1117; /* GitHub Dark 배경 */
+            color: #C9D1D9; /* 밝은 회색 텍스트 */
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* [2. Layout] */
+        .archive-container {
+            max-width: 800px;
+            margin: 5rem auto;
+            padding: 0 2rem;
+        }
+
+        .nav-back {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            color: #58A6FF;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 3rem;
+            transition: color 0.2s;
+        }
+
+        .nav-back:hover {
+            color: #79C0FF;
+            text-decoration: underline;
+        }
+
+        /* [3. Header Section] */
+        .header-block {
+            border-bottom: 1px solid #30363D;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0 0 0.5rem 0;
+            color: #FFF;
+            letter-spacing: -1px;
+        }
+
+        .terminal-prompt {
+            font-family: 'JetBrains Mono', monospace;
+            color: #8B949E;
+            font-size: 0.9rem;
+        }
+        
+        .terminal-prompt span {
+            color: #3FB950; /* 터미널의 초록색 프롬프트 포인트 */
+        }
+
+        /* [4. Document List (Data Log)] */
+        .doc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .doc-item {
+            display: grid;
+            grid-template-columns: 120px 1fr; /* 날짜(120px) | 제목(나머지)의 고정 그리드 */
+            align-items: baseline;
+            gap: 1.5rem;
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid #21262D;
+            transition: background-color 0.2s;
+        }
+
+        .doc-item:hover {
+            background-color: rgba(139, 148, 158, 0.05); /* 마우스 오버 시 미세한 하이라이트 */
+            border-left: 3px solid #58A6FF; /* 좌측 파란색 인디케이터 */
+            padding-left: calc(1rem - 3px); /* 레이아웃 밀림 방지 */
+        }
+
+        .doc-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #8B949E;
+        }
+
+        .doc-link {
+            text-decoration: none;
+            color: #C9D1D9;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .doc-item:hover .doc-link {
+            color: #58A6FF; /* 링크 색상 활성화 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="archive-container">
+        <a href="/" class="nav-back">$ cd ../</a>
+
+        <div class="header-block">
+            <h1>Silicon Archive</h1>
+            <div class="terminal-prompt"><span>user@studio.lib:~/silicon$</span> ls -la</div>
+        </div>
+
+        <ul class="doc-list">
+            {posts.map((post) => (
+                <li class="doc-item">
+                    <span class="doc-date">{post.frontmatter.date}</span>
+                    <a href={post.url} class="doc-link">{post.frontmatter.title}</a>
+                </li>
+            ))}
+        </ul>
+    </div>
+
+</body>
+</html>
