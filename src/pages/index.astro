@@ -38,6 +38,23 @@ import Sticker from '../components/Sticker.astro';
                     <div class="node-data"><strong>GITHUB_REPO</strong><br/>Source codes & controls</div>
                 </a>
             </nav>
+            <footer class="io-interfaces">
+                <div class="io-title">EXTERNAL I/O PORTS //</div>
+                <div class="io-ports-grid">
+                    <a href="mailto:your.email@example.com" class="io-port">
+                        <span class="port-type">[MAIL]</span>
+                        <span class="port-val">TX/RX_Request</span>
+                    </a>
+                    <a href="https://github.com/당신의아이디" target="_blank" rel="noopener noreferrer" class="io-port">
+                        <span class="port-type">[GIT]</span>
+                        <span class="port-val">Source_Control</span>
+                    </a>
+                    <a href="https://instagram.com/당신의아이디" target="_blank" rel="noopener noreferrer" class="io-port">
+                        <span class="port-type">[SNS]</span>
+                        <span class="port-val">Analog_Life_Log</span>
+                    </a>
+                </div>
+            </footer>
         </main>
     </div>
 </BaseLayout>
@@ -127,7 +144,7 @@ import Sticker from '../components/Sticker.astro';
     }
     .schematic-node {
         display: flex;
-        align-items: center;
+        align-items: center; /* 다시 중앙 정렬로 롤백 */
         text-decoration: none;
         color: #4A3F35;
         border: 1px solid #4A3F35;
@@ -141,8 +158,8 @@ import Sticker from '../components/Sticker.astro';
     }
     .pin { 
         padding: 1rem; 
-        background: #4A3F35; 
-        color: #F4EBD0; 
+        background: #4A3F35; /* 타이틀 색상과 동일하게 설정 */
+        color: #F4EBD0; /* 가독성을 위해 밝은 대비색 사용 */
         font-family: 'JetBrains Mono', monospace; 
         font-size: 0.8rem; 
         border-right: 1px solid #4A3F35; 
@@ -156,16 +173,86 @@ import Sticker from '../components/Sticker.astro';
         line-height: 1.4;
     }
     .schematic-node:hover .pin { 
-        background: #F4EBD0; 
+        background: #F4EBD0; /* 호버 시 전체 배경색으로 반전 */
         color: #4A3F35; 
+    }
+    .io-interfaces {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px dashed #4A3F35; /* 데이터시트의 절취선 느낌 */
+    }
+    .io-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        color: #8C6F56;
+        margin-bottom: 0.8rem;
+        letter-spacing: 1px;
+    }
+    .io-ports-grid {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .io-port {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #4A3F35;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        transition: transform 0.1s ease;
+    }
+    .io-port:hover {
+        color: #D32F2F; /* 동작(Active) 상태의 붉은색 인디케이터 */
+        transform: translateX(3px); /* 마우스 오버 시 미세한 물리적 피드백 */
+    }
+    .port-type {
+        font-weight: bold;
+        margin-right: 0.4rem;
+    }
+    .port-val {
+        opacity: 0.8;
+        text-decoration: underline;
+        text-underline-offset: 3px;
     }
 
     /* 5. 모바일/태블릿 대응 (반응형 예외 처리) */
-    /* 뷰포트 너비가 1000px 이하로 좁아져서 스티커와 메인보드가 물리적으로 충돌할 경우, 
-       복잡도를 낮추기 위해 스티커 레이어의 렌더링을 완전히 차단(Drop)합니다. */
     @media (max-width: 1000px) {
+        /* 뷰포트 너비가 1000px 이하로 좁아질 경우 스티커 숨김 */
         .sticker-layer {
             display: none;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .viewport-wrapper {
+            padding: 1rem;
+            /* 세로 스크롤 허용, 가로 스크롤 방지 */
+            overflow-x: hidden;
+            overflow-y: auto;
+            align-items: stretch; /* 상하단 꽉 차게 프레임을 화면에 맞춤 */
+        }
+        
+        .schematic-container {
+            padding: 1.5rem;
+            box-shadow: 4px 4px 0px rgba(74, 63, 53, 0.1); /* 꽉 차는 프레임에 맞게 그림자 조정 */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* 내부 콘텐츠는 위에서부터 정렬 */
+        }
+
+        .schematic-header h1 {
+            font-size: 2rem; /* 폰트 크기 축소 */
+        }
+
+        .pin {
+            padding: 0.8rem;
+            min-width: 50px;
+        }
+
+        .node-data {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
         }
     }
 </style>
