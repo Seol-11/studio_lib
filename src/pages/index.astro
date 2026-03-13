@@ -91,7 +91,6 @@ import Sticker from '../components/Sticker.astro';
         position: relative; 
         width: 100%;
         max-width: 600px;
-        min-height: 600px; /* 기본 높이 확보 */
         display: flex;
         flex-direction: column;
         background: rgba(244, 235, 208, 0.95); 
@@ -138,7 +137,7 @@ import Sticker from '../components/Sticker.astro';
     }
     .schematic-node {
         display: flex;
-        align-items: center; /* 다시 중앙 정렬로 롤백 */
+        align-items: center; 
         text-decoration: none;
         color: #4A3F35;
         border: 1px solid #4A3F35;
@@ -152,8 +151,8 @@ import Sticker from '../components/Sticker.astro';
     }
     .pin { 
         padding: 1rem; 
-        background: #4A3F35; /* 타이틀 색상과 동일하게 설정 */
-        color: #F4EBD0; /* 가독성을 위해 밝은 대비색 사용 */
+        background: #4A3F35; 
+        color: #F4EBD0; 
         font-family: 'JetBrains Mono', monospace; 
         font-size: 0.8rem; 
         border-right: 1px solid #4A3F35; 
@@ -167,11 +166,11 @@ import Sticker from '../components/Sticker.astro';
         line-height: 1.4;
     }
     .schematic-node:hover .pin { 
-        background: #F4EBD0; /* 호버 시 전체 배경색으로 반전 */
+        background: #F4EBD0; 
         color: #4A3F35; 
     }
     .sys-footer {
-        margin-top: auto; /* 푸터를 하단으로 밀어냄 */
+        margin-top: 2rem; /* 고정 높이 대신 적절한 여백 사용 */
         padding-top: 1.5rem;
         border-top: 1px dashed #8C6F56; 
         display: flex;
@@ -200,7 +199,6 @@ import Sticker from '../components/Sticker.astro';
 
     /* 5. 모바일/태블릿 대응 (반응형 예외 처리) */
     @media (max-width: 1000px) {
-        /* 뷰포트 너비가 1000px 이하로 좁아질 경우 스티커 숨김 */
         .sticker-layer {
             display: none;
         }
@@ -209,18 +207,17 @@ import Sticker from '../components/Sticker.astro';
     @media (max-width: 600px) {
         .viewport-wrapper {
             padding: 1rem;
-            /* 세로 스크롤 허용, 가로 스크롤 방지 */
             overflow-x: hidden;
             overflow-y: auto;
-            align-items: stretch; /* 상하단 꽉 차게 프레임을 화면에 맞춤 */
+            align-items: center; /* 다시 중앙 정렬로 변경 */
         }
         
         .schematic-container {
             padding: 1.5rem;
-            min-height: calc(100vh - 2rem); /* 모바일에서 화면 높이에 맞춤 */
             box-shadow: 4px 4px 0px rgba(74, 63, 53, 0.1); 
             display: flex;
             flex-direction: column;
+            width: 100%; /* 너비 확보 */
         }
 
         .schematic-header h1 {
@@ -238,7 +235,7 @@ import Sticker from '../components/Sticker.astro';
         }
 
         .sys-footer {
-            font-size: 0.65rem; /* 모바일에서 한 줄 유지를 위해 폰트 축소 */
+            font-size: 0.65rem; 
             gap: 0.5rem;
         }
     }
