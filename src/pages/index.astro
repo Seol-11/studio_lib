@@ -38,21 +38,12 @@ import Sticker from '../components/Sticker.astro';
                     <div class="node-data"><strong>GITHUB_REPO</strong><br/>Source codes & controls</div>
                 </a>
             </nav>
-            <footer class="io-interfaces">
-                <div class="io-title">EXTERNAL I/O PORTS //</div>
-                <div class="io-ports-grid">
-                    <a href="mailto:your.email@example.com" class="io-port">
-                        <span class="port-type">[MAIL]</span>
-                        <span class="port-val">TX/RX_Request</span>
-                    </a>
-                    <a href="https://github.com/당신의아이디" target="_blank" rel="noopener noreferrer" class="io-port">
-                        <span class="port-type">[GIT]</span>
-                        <span class="port-val">Source_Control</span>
-                    </a>
-                    <a href="https://instagram.com/당신의아이디" target="_blank" rel="noopener noreferrer" class="io-port">
-                        <span class="port-type">[SNS]</span>
-                        <span class="port-val">Analog_Life_Log</span>
-                    </a>
+            <footer class="sys-footer">
+                <div class="footer-brand">© 2026 STUDIO.LIB</div>
+                <div class="footer-meta">
+                    <span>v1.0.0</span>
+                    <span class="divider">|</span>
+                    <span>Built with Astro</span>
                 </div>
             </footer>
         </main>
@@ -100,11 +91,14 @@ import Sticker from '../components/Sticker.astro';
         position: relative; 
         width: 100%;
         max-width: 600px;
+        min-height: 600px; /* 기본 높이 확보 */
+        display: flex;
+        flex-direction: column;
         background: rgba(244, 235, 208, 0.95); 
         border: 2px solid #4A3F35;
         padding: 2rem;
         box-shadow: 10px 10px 0px rgba(74, 63, 53, 0.1);
-        z-index: 10; /* 스티커 레이어(5)보다 높게 설정하여 메인보드 정보 가림 방지 */
+        z-index: 10;
     }
     
     .coord-marker { 
@@ -176,45 +170,33 @@ import Sticker from '../components/Sticker.astro';
         background: #F4EBD0; /* 호버 시 전체 배경색으로 반전 */
         color: #4A3F35; 
     }
-    .io-interfaces {
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px dashed #4A3F35; /* 데이터시트의 절취선 느낌 */
-    }
-    .io-title {
+    .sys-footer {
+        margin-top: auto; /* 푸터를 하단으로 밀어냄 */
+        padding-top: 1.5rem;
+        border-top: 1px dashed #8C6F56; 
+        display: flex;
+        justify-content: space-between; 
+        align-items: center;
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.75rem;
         color: #8C6F56;
-        margin-bottom: 0.8rem;
-        letter-spacing: 1px;
     }
-    .io-ports-grid {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    .io-port {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        color: #4A3F35;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.85rem;
-        transition: transform 0.1s ease;
-    }
-    .io-port:hover {
-        color: #D32F2F; /* 동작(Active) 상태의 붉은색 인디케이터 */
-        transform: translateX(3px); /* 마우스 오버 시 미세한 물리적 피드백 */
-    }
-    .port-type {
+    
+    .footer-brand {
         font-weight: bold;
-        margin-right: 0.4rem;
+        letter-spacing: 0.5px;
     }
-    .port-val {
+    
+    .footer-meta {
+        display: flex;
+        gap: 0.8rem;
         opacity: 0.8;
-        text-decoration: underline;
-        text-underline-offset: 3px;
     }
+    
+    .divider {
+        opacity: 0.5;
+    }
+
 
     /* 5. 모바일/태블릿 대응 (반응형 예외 처리) */
     @media (max-width: 1000px) {
@@ -235,14 +217,14 @@ import Sticker from '../components/Sticker.astro';
         
         .schematic-container {
             padding: 1.5rem;
-            box-shadow: 4px 4px 0px rgba(74, 63, 53, 0.1); /* 꽉 차는 프레임에 맞게 그림자 조정 */
+            min-height: calc(100vh - 2rem); /* 모바일에서 화면 높이에 맞춤 */
+            box-shadow: 4px 4px 0px rgba(74, 63, 53, 0.1); 
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* 내부 콘텐츠는 위에서부터 정렬 */
         }
 
         .schematic-header h1 {
-            font-size: 2rem; /* 폰트 크기 축소 */
+            font-size: 2rem; 
         }
 
         .pin {
@@ -253,6 +235,11 @@ import Sticker from '../components/Sticker.astro';
         .node-data {
             padding: 0.6rem 0.8rem;
             font-size: 0.85rem;
+        }
+
+        .sys-footer {
+            font-size: 0.65rem; /* 모바일에서 한 줄 유지를 위해 폰트 축소 */
+            gap: 0.5rem;
         }
     }
 </style>
