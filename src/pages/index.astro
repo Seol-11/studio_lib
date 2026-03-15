@@ -1,7 +1,7 @@
 ---
 // src/pages/index.astro
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Sticker from '../components/Sticker.astro';
+import Stickers from '../components/Stickers.astro';
 ---
 
 <BaseLayout title="Studio.lib | System Router">
@@ -27,14 +27,11 @@ import Sticker from '../components/Sticker.astro';
             <div class="blob b2"></div>
             <div class="blob b3"></div>
         </div>
-
+            
         <main class="schematic-container">
-            <div class="sticker-overlap so-1">
-                <Sticker type="QC_PASSED" rotate="-15" />
-            </div>
-            <div class="sticker-overlap so-2">
-                <Sticker type="HIGH_VOLTAGE" rotate="12" />
-            </div>
+
+            <Stickers type="QC_PASSED" top="-45px" left="-35px" width={85} rotate={-15} />    
+
 
             <header class="schematic-header">
                 <h1>Studio.lib</h1>
@@ -60,7 +57,7 @@ import Sticker from '../components/Sticker.astro';
                         <span class="node-desc">Loose-leaf binder index</span>
                     </div>
                 </a>
-                <a href="https://github.com/당신의깃허브아이디" target="_blank" rel="noopener noreferrer" class="schematic-node">
+                <a href="https://github.com/seol-11" target="_blank" rel="noopener noreferrer" class="schematic-node">
                     <div class="node-data">
                         <span class="node-title">GITHUB_REPO</span>
                         <span class="node-desc">Source codes & controls</span>
@@ -77,19 +74,16 @@ import Sticker from '../components/Sticker.astro';
 </BaseLayout>
 
 <script is:inline>
-    // 돔 로드 완료 후 이벤트 바인딩 및 OS 레벨 인터럽트 감지
     window.addEventListener('DOMContentLoaded', () => {
         const toggleBtn = document.getElementById("theme-toggle");
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        // 1. OS 시스템 테마 실시간 동기화 (유저가 수동 오버라이드 하지 않은 경우)
         mediaQuery.addEventListener('change', (e) => {
             if (!localStorage.getItem('theme')) {
                 document.documentElement.classList.toggle('dark', e.matches);
             }
         });
 
-        // 2. 수동 테마 토글 핸들러
         if (toggleBtn) {
             toggleBtn.addEventListener("click", () => {
                 const isNowDark = document.documentElement.classList.toggle("dark");
@@ -134,7 +128,6 @@ import Sticker from '../components/Sticker.astro';
         --noise-opacity: 0.02; 
     }
 
-    /* 기존의 폰트, 마진, 렌더링 속성은 BaseLayout으로 넘겼으므로 삭제 */
     :global(body) {
         background: var(--bg-color);
         overflow-x: hidden;
@@ -227,9 +220,7 @@ import Sticker from '../components/Sticker.astro';
         transition: background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
     }
 
-    .sticker-overlap { position: absolute; z-index: 20; pointer-events: none; }
-    .so-1 { top: -45px; left: -35px; transform: scale(0.85); }
-    .so-2 { bottom: 60px; right: -55px; transform: scale(0.95); }
+    /* [최적화] 사용되지 않는 .sticker-overlap, .so-1, .so-2 클래스 코드블럭 완전 삭제 */
 
     .schematic-header { 
         margin-bottom: 3.5rem; 
@@ -263,11 +254,9 @@ import Sticker from '../components/Sticker.astro';
         color: var(--text-primary);
         padding: 1.5rem 2rem;
         background: transparent; 
-        /* 불필요한 테두리 렌더링 제거, GPU 가속 전담 transform만 트랜지션 할당 */
         transition: transform var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* 상자 외곽선과 그림자 없이 오직 글자 덩어리만 X축으로 이동 */
     .schematic-node:hover { 
         transform: translateX(var(--hover-offset));
     }
@@ -299,8 +288,7 @@ import Sticker from '../components/Sticker.astro';
     @media (max-width: 600px) {
         :root {
             --hover-offset: 5px; 
-        }
-        .sticker-overlap { display: none; }
+        }        
         .viewport-wrapper { padding: 0; align-items: stretch; }
         .schematic-container {
             max-width: none; width: 100%; border-radius: 0;
