@@ -13,7 +13,7 @@
         <div class="menu-group">
             <div class="group-title">CATEGORIES</div>
             
-            <details class="category-folder" data-folder-id="log" open>
+            <details class="category-folder" data-folder-id="log">
                 <summary class="menu-item folder-title">Daily Log (일상)</summary>
                 <div class="folder-content">
                     <a href="/blog/log/diary" class="menu-item sub-item">일기</a>
@@ -22,7 +22,7 @@
                 </div>
             </details>
 
-            <details class="category-folder" data-folder-id="study" open>
+            <details class="category-folder" data-folder-id="study">
                 <summary class="menu-item folder-title">Study Notes (공부)</summary>
                 <div class="folder-content">
                     <a href="/blog/study/arch" class="menu-item sub-item">Architecture</a>
@@ -37,6 +37,26 @@
 </aside>
 
 <script is:inline>
+    // FOUC 방지를 위해 DOMContentLoaded를 기다리지 않고 즉시 실행하여 상태 복원
+    (function() {
+        const folders = document.querySelectorAll('.category-folder');
+        folders.forEach(folder => {
+            const id = folder.getAttribute('data-folder-id');
+            if (!id) return;
+
+            const state = localStorage.getItem(`folder-state-${id}`);
+            if (state === 'closed') {
+                folder.removeAttribute('open');
+            } else {
+                folder.setAttribute('open', ''); // 기본값은 열림
+            }
+
+            folder.addEventListener('toggle', () => {
+                localStorage.setItem(`folder-state-${id}`, folder.hasAttribute('open') ? 'open' : 'closed');
+            });
+        });
+    })();
+
     document.addEventListener('DOMContentLoaded', () => {
         // 현재 경로에 따라 활성화된 메뉴 강조
         const currentPath = window.location.pathname;
@@ -50,26 +70,6 @@
                 item.classList.add('active'); // astro index.html 특성 대응
             }
         });
-
-        // Category Folders persistence
-        const folders = document.querySelectorAll('.category-folder');
-        folders.forEach(folder => {
-            const id = folder.getAttribute('data-folder-id');
-            if (!id) return;
-
-            // Load state from localStorage
-            const state = localStorage.getItem(`folder-state-${id}`);
-            if (state === 'closed') {
-                folder.removeAttribute('open');
-            } else if (state === 'open') {
-                folder.setAttribute('open', '');
-            }
-
-            // Save state on toggle
-            folder.addEventListener('toggle', () => {
-                localStorage.setItem(`folder-state-${id}`, folder.hasAttribute('open') ? 'open' : 'closed');
-            });
-        });
     });
 </script>
 
@@ -77,10 +77,10 @@
     /* Sidebars */
     .left-sidebar {
         position: sticky;
-        top: 100px;
+        top: calc(60px + 3rem); /* 헤더 높이(60px) + 컨테이너 상단 여백(3rem). 0px 유격 완벽 고정 */
         align-self: start;
         height: max-content;
-        max-height: calc(100vh - 120px);
+        max-height: calc(100vh - 60px - 3rem - 2rem); /* 뷰포트 하단 여백 확보 */
         overflow-y: auto;
         padding-right: 1rem;
         scrollbar-width: none; /* 스크롤바 숨김 (Firefox) */

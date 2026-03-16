@@ -341,13 +341,13 @@
         padding: 1rem 0;
         background: var(--bg-color); /* Ensure background is solid */
     }
-    .search-empty {
+    :global(.search-empty) {
         padding: 2rem;
         text-align: center;
         color: var(--text-secondary);
         font-size: 0.9rem;
     }
-    .search-result-item {
+    :global(.search-result-item) {
         display: block;
         padding: 0.8rem 1.5rem;
         text-decoration: none !important;
@@ -356,20 +356,20 @@
         border-left: 3px solid transparent;
         transition: background 0.2s, border-color 0.2s;
     }
-    .search-result-item:hover {
+    :global(.search-result-item:hover) {
         background: var(--hover-bg, rgba(0,0,0,0.05));
         border-left-color: var(--text-primary);
         color: var(--text-primary) !important; /* Force color on hover */
         text-decoration: none !important;
     }
-    .search-result-title {
+    :global(.search-result-title) {
         color: var(--text-primary);
         font-weight: 700;
         margin-bottom: 0.2rem;
         text-decoration: none !important;
         display: block; /* Ensure it stays clean */
     }
-    .search-result-desc {
+    :global(.search-result-desc) {
         color: var(--text-secondary);
         font-size: 0.85rem;
         white-space: nowrap;

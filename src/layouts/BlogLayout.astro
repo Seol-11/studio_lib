@@ -131,10 +131,10 @@ const {
 
     .right-sidebar {
         position: sticky;
-        top: 100px;
+        top: calc(60px + 3rem); /* 헤더 높이(60px) + 컨테이너 상단 여백(3rem). 0px 유격 완벽 고정 */
         align-self: start;
         height: max-content;
-        max-height: calc(100vh - 120px);
+        max-height: calc(100vh - 60px - 3rem - 2rem); /* 뷰포트 하단 여백 확보 */
         overflow-y: auto;
         padding-right: 1rem;
         scrollbar-width: none; /* 사이드바 스크롤바 숨김 */
