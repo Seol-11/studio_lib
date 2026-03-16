@@ -1,0 +1,125 @@
+---
+import BlogLayout from './BlogLayout.astro';
+
+const { frontmatter, headings } = Astro.props;
+---
+<BlogLayout title={`${frontmatter.title} | Studio.lib`} description={frontmatter.description} headings={headings}>
+    <article class="markdown-body">
+        <header class="post-header">
+            <h1 class="post-title">{frontmatter.title}</h1>
+            <div class="post-meta">
+                <span class="date">{frontmatter.date}</span>
+                {frontmatter.tags && frontmatter.tags.map((tag: string) => (
+                    <span class="tag">#{tag}</span>
+                ))}
+            </div>
+        </header>
+        
+        <div class="post-content">
+            <slot />
+        </div>
+    </article>
+</BlogLayout>
+
+<style is:global>
+    .markdown-body {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .post-header {
+        margin-bottom: 3rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 2rem;
+    }
+    .post-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 1rem 0;
+        line-height: 1.2;
+        letter-spacing: -1px;
+    }
+    .post-meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+    .post-meta .tag {
+        background: var(--border-color);
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    /* Markdown Content Styling */
+    .post-content {
+        line-height: 1.7;
+        font-size: 1.05rem;
+        color: var(--text-primary);
+    }
+    .post-content h1, .post-content h2, .post-content h3, .post-content h4, .post-content h5, .post-content h6 {
+        scroll-margin-top: 100px; /* 헤더 60px + 여백 40px */
+    }
+    .post-content h2 {
+        font-size: 1.8rem;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    .post-content h3 {
+        font-size: 1.4rem;
+        margin-top: 2rem;
+        margin-bottom: 0.8rem;
+        font-weight: 700;
+    }
+    .post-content p {
+        margin-bottom: 1.5rem;
+    }
+    .post-content a {
+        color: #3b82f6;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+    }
+    .post-content ul, .post-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+    }
+    .post-content li {
+        margin-bottom: 0.5rem;
+    }
+    .post-content blockquote {
+        border-left: 4px solid var(--border-color);
+        padding-left: 1rem;
+        color: var(--text-secondary);
+        font-style: italic;
+        margin: 1.5rem 0;
+    }
+    .post-content code {
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--hover-bg, rgba(0,0,0,0.05));
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    .post-content pre {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+    }
+    .post-content pre code {
+        background: transparent;
+        padding: 0;
+        color: inherit;
+    }
+    .post-content img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin: 1.5rem 0;
+        border: 1px solid var(--border-color);
+    }
+</style>

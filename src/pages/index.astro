@@ -1,21 +1,9 @@
 ---
 // src/pages/index.astro
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Stickers from '../components/Stickers.astro';
 ---
 
 <BaseLayout title="Studio.lib | System Router">
-    <script is:inline>
-        const theme = (() => {
-            if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-                return localStorage.getItem('theme');
-            }
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        })();
-        if (theme === 'dark') document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
-    </script>
-
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode">
         <svg class="sun" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="18.36" x2="5.64" y2="16.92"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="moon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -41,16 +29,16 @@ import Stickers from '../components/Stickers.astro';
                         <span class="node-desc">Hardware architectures</span>
                     </div>
                 </a>
-                <a href="/silicon" class="schematic-node">
-                    <div class="node-data">
-                        <span class="node-title">SILICON_ARCHIVE</span>
-                        <span class="node-desc">NoC & Interfaces</span>
-                    </div>
-                </a>
-                <a href="/archive" class="schematic-node">
+                <a href="/blog" class="schematic-node">
                     <div class="node-data">
                         <span class="node-title">ANALOG_LOG</span>
-                        <span class="node-desc">Loose-leaf binder index</span>
+                        <span class="node-desc">Blog & Study Notes</span>
+                    </div>
+                </a>
+                <a href="#" class="schematic-node disabled" onclick="event.preventDefault();">
+                    <div class="node-data">
+                        <span class="node-title">EMPTY_SLOT</span>
+                        <span class="node-desc">Reserved for future use</span>
                     </div>
                 </a>
                 <a href="https://github.com/seol-11" target="_blank" rel="noopener noreferrer" class="schematic-node">
@@ -70,17 +58,20 @@ import Stickers from '../components/Stickers.astro';
 </BaseLayout>
 
 <script is:inline>
-    window.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('astro:page-load', () => {
         const toggleBtn = document.getElementById("theme-toggle");
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        mediaQuery.addEventListener('change', (e) => {
+        const listener = (e) => {
             if (!localStorage.getItem('theme')) {
                 document.documentElement.classList.toggle('dark', e.matches);
             }
-        });
+        };
 
-        if (toggleBtn) {
+        mediaQuery.addEventListener('change', listener);
+
+        if (toggleBtn && !toggleBtn.dataset.init) {
+            toggleBtn.dataset.init = "true";
             toggleBtn.addEventListener("click", () => {
                 const isNowDark = document.documentElement.classList.toggle("dark");
                 localStorage.setItem("theme", isNowDark ? "dark" : "light");
@@ -126,7 +117,6 @@ import Stickers from '../components/Stickers.astro';
 
     :global(body) {
         background: var(--bg-color);
-        overflow-x: hidden;
         transition: background-color var(--transition-speed) ease;
     }
 
@@ -253,8 +243,12 @@ import Stickers from '../components/Stickers.astro';
         transition: transform var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .schematic-node:hover { 
+    .schematic-node:hover:not(.disabled) { 
         transform: translateX(var(--hover-offset));
+    }
+    .schematic-node.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
     }
 
     .node-title {

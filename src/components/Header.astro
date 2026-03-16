@@ -1,0 +1,387 @@
+---
+// src/components/Header.astro
+---
+<header class="sys-header" transition:persist="blog-header">
+    <div class="header-inner">
+        <div class="nav-left">
+            <a href="/" class="brand">Studio.lib</a>
+        </div>
+        
+        <div class="nav-right">
+            <nav class="main-nav">
+                <a href="/blog" class="nav-item">Blog</a>
+                <a href="/archive" class="nav-item">Archive</a>
+                <a href="/contact" class="nav-item">Contact</a>
+            </nav>
+            
+            <button id="search-btn" class="search-btn" aria-label="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+
+            <button id="theme-toggle-header" class="theme-toggle-btn" aria-label="Toggle Dark Mode">
+                <svg class="sun" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="18.36" x2="5.64" y2="16.92"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="moon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Mobile Navigation -->
+    <div id="mobile-nav" class="mobile-nav">
+        <a href="/blog" class="mobile-nav-item">Blog</a>
+        <a href="/archive" class="mobile-nav-item">Archive</a>
+        <a href="/contact" class="mobile-nav-item">Contact</a>
+    </div>
+</header>
+
+<!-- Search Modal -->
+<div id="search-modal" class="search-modal">
+    <div class="search-modal-backdrop"></div>
+    <div class="search-modal-content">
+        <div class="search-input-wrapper">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="search-input" placeholder="Search posts..." autocomplete="off" />
+            <button id="close-search" class="close-search-btn">ESC</button>
+        </div>
+        <div id="search-results" class="search-results">
+            <div class="search-empty">Type to start searching...</div>
+        </div>
+    </div>
+</div>
+
+<script is:inline>
+    window.addEventListener('DOMContentLoaded', () => {
+        // Theme Toggle
+        const toggleBtn = document.getElementById("theme-toggle-header");
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", () => {
+                const isNowDark = document.documentElement.classList.toggle("dark");
+                localStorage.setItem("theme", isNowDark ? "dark" : "light");
+            });
+        }
+        
+        // Active Menu Highlight
+        const currentPath = window.location.pathname;
+        const navItems = document.querySelectorAll('.nav-item, .mobile-nav-item');
+        navItems.forEach(item => {
+            item.classList.remove('active');
+            if (currentPath.startsWith(item.getAttribute('href'))) {
+                item.classList.add('active');
+            }
+        });
+
+        // Mobile Menu Logic
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileNav = document.getElementById('mobile-nav');
+        if (mobileBtn && mobileNav) {
+            mobileBtn.addEventListener('click', () => {
+                mobileNav.classList.toggle('open');
+            });
+        }
+
+        // Search Logic
+        const searchBtn = document.getElementById('search-btn');
+        const searchModal = document.getElementById('search-modal');
+        const closeSearchBtn = document.getElementById('close-search');
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        const backdrop = document.querySelector('.search-modal-backdrop');
+
+        let searchData = null;
+
+        const openSearch = async () => {
+            searchModal.classList.add('active');
+            searchInput.focus();
+            document.body.style.overflow = 'hidden';
+            
+            if (!searchData) {
+                try {
+                    const res = await fetch('/search.json');
+                    searchData = await res.json();
+                } catch (e) {
+                    console.error('Failed to load search data', e);
+                }
+            }
+        };
+
+        const closeSearch = () => {
+            searchModal.classList.remove('active');
+            document.body.style.overflow = '';
+            searchInput.value = '';
+            searchResults.innerHTML = '<div class="search-empty">Type to start searching...</div>';
+        };
+
+        if (searchBtn) {
+            searchBtn.addEventListener('click', openSearch);
+            closeSearchBtn?.addEventListener('click', closeSearch);
+            backdrop?.addEventListener('click', closeSearch);
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && searchModal.classList.contains('active')) {
+                    closeSearch();
+                }
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    openSearch();
+                }
+            });
+
+            searchInput?.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                if (!query) {
+                    searchResults.innerHTML = '<div class="search-empty">Type to start searching...</div>';
+                    return;
+                }
+                if (!searchData) return;
+
+                const results = searchData.filter(item => 
+                    item.title.toLowerCase().includes(query) || 
+                    item.description.toLowerCase().includes(query) ||
+                    (item.tags && item.tags.some(t => t.toLowerCase().includes(query)))
+                );
+
+                if (results.length === 0) {
+                    searchResults.innerHTML = '<div class="search-empty">No results found for "'+query+'"</div>';
+                    return;
+                }
+
+                searchResults.innerHTML = results.map(item => `
+                    <a href="${item.url}" class="search-result-item">
+                        <div class="search-result-title">${item.title}</div>
+                        <div class="search-result-desc">${item.description}</div>
+                    </a>
+                `).join('');
+            });
+        }
+    });
+</script>
+
+<style>
+    /* Header Styles */
+    .sys-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: var(--header-bg, rgba(253, 252, 248, 0.7));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: background-color 0.3s ease;
+    }
+    :global(html.dark) .sys-header {
+        background: var(--header-bg, rgba(18, 18, 18, 0.7));
+        border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));
+    }
+
+    .header-inner {
+        width: 100%;
+        max-width: 1400px;
+        height: 60px;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .brand {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        letter-spacing: -0.5px;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .main-nav {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .nav-item {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: color 0.2s ease;
+    }
+
+    .nav-item:hover, .nav-item.active {
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    .search-btn, .theme-toggle-btn, .mobile-menu-btn {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.4rem;
+        border-radius: 4px;
+        transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .search-btn:hover, .theme-toggle-btn:hover, .mobile-menu-btn:hover {
+        color: var(--text-primary);
+        background: var(--border-color);
+    }
+
+    .mobile-menu-btn {
+        display: none;
+    }
+
+    .sun { display: block; } .moon { display: none; }
+    :global(html.dark) .sun { display: none; }
+    :global(html.dark) .moon { display: block; }
+
+    /* Mobile Nav */
+    .mobile-nav {
+        display: none;
+        width: 100%;
+        background: var(--bg-color);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 2rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .mobile-nav.open {
+        display: flex;
+    }
+    .mobile-nav-item {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    /* Search Modal Styles */
+    .search-modal {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 2000;
+        display: none;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 10vh;
+    }
+    .search-modal.active {
+        display: flex;
+    }
+    .search-modal-backdrop {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+    }
+    .search-modal-content {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        margin: 0 1rem;
+    }
+    .search-input-wrapper {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .search-icon {
+        color: var(--text-secondary);
+        margin-right: 1rem;
+    }
+    .search-input-wrapper input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        outline: none;
+        font-family: 'Inter', sans-serif;
+    }
+    .close-search-btn {
+        background: var(--border-color);
+        border: none;
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    .search-results {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 1rem 0;
+        background: var(--bg-color); /* Ensure background is solid */
+    }
+    .search-empty {
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+    .search-result-item {
+        display: block;
+        padding: 0.8rem 1.5rem;
+        text-decoration: none !important;
+        color: var(--text-primary) !important;
+        background: transparent; /* Reset default link background */
+        border-left: 3px solid transparent;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .search-result-item:hover {
+        background: var(--hover-bg, rgba(0,0,0,0.05));
+        border-left-color: var(--text-primary);
+        color: var(--text-primary) !important; /* Force color on hover */
+        text-decoration: none !important;
+    }
+    .search-result-title {
+        color: var(--text-primary);
+        font-weight: 700;
+        margin-bottom: 0.2rem;
+        text-decoration: none !important;
+        display: block; /* Ensure it stays clean */
+    }
+    .search-result-desc {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-decoration: none !important;
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .main-nav { display: none; }
+        .mobile-menu-btn { display: flex; }
+        .header-inner { padding: 0 1.5rem; }
+    }
+</style>

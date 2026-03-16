@@ -1,0 +1,180 @@
+---
+// src/components/BlogSidebar.astro
+---
+
+<aside class="left-sidebar">
+    <nav class="index-menu">
+        <div class="menu-group">
+            <div class="group-title">ROUTING_TABLE</div>
+            <a href="/" class="menu-item">/root (Home)</a>
+            <a href="/blog" class="menu-item">/blog (Index)</a>
+        </div>
+        
+        <div class="menu-group">
+            <div class="group-title">CATEGORIES</div>
+            
+            <details class="category-folder" data-folder-id="log" open>
+                <summary class="menu-item folder-title">Daily Log (일상)</summary>
+                <div class="folder-content">
+                    <a href="/blog/log/diary" class="menu-item sub-item">일기</a>
+                    <a href="/blog/log/music" class="menu-item sub-item">음악</a>
+                    <a href="/blog/log/cooking" class="menu-item sub-item">요리</a>
+                </div>
+            </details>
+
+            <details class="category-folder" data-folder-id="study" open>
+                <summary class="menu-item folder-title">Study Notes (공부)</summary>
+                <div class="folder-content">
+                    <a href="/blog/study/arch" class="menu-item sub-item">Architecture</a>
+                    <a href="/blog/study/rtl" class="menu-item sub-item">RTL Design</a>
+                </div>
+            </details>
+
+            <a href="/blog/env" class="menu-item">Environment (환경세팅)</a>
+            <a href="/blog/project" class="menu-item">Projects (기획)</a>
+        </div>
+    </nav>
+</aside>
+
+<script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 현재 경로에 따라 활성화된 메뉴 강조
+        const currentPath = window.location.pathname;
+        const menuItems = document.querySelectorAll('.left-sidebar .menu-item:not(.folder-title)');
+        menuItems.forEach(item => {
+            const href = item.getAttribute('href');
+            // 정확한 일치 혹은 서브 경로일 때 active
+            if (href === currentPath || (href !== '/' && href !== '/blog' && currentPath.startsWith(href))) {
+                item.classList.add('active');
+            } else if (href === '/blog' && currentPath === '/blog/') {
+                item.classList.add('active'); // astro index.html 특성 대응
+            }
+        });
+
+        // Category Folders persistence
+        const folders = document.querySelectorAll('.category-folder');
+        folders.forEach(folder => {
+            const id = folder.getAttribute('data-folder-id');
+            if (!id) return;
+
+            // Load state from localStorage
+            const state = localStorage.getItem(`folder-state-${id}`);
+            if (state === 'closed') {
+                folder.removeAttribute('open');
+            } else if (state === 'open') {
+                folder.setAttribute('open', '');
+            }
+
+            // Save state on toggle
+            folder.addEventListener('toggle', () => {
+                localStorage.setItem(`folder-state-${id}`, folder.hasAttribute('open') ? 'open' : 'closed');
+            });
+        });
+    });
+</script>
+
+<style>
+    /* Sidebars */
+    .left-sidebar {
+        position: sticky;
+        top: 100px;
+        align-self: start;
+        height: max-content;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        padding-right: 1rem;
+        scrollbar-width: none; /* 스크롤바 숨김 (Firefox) */
+    }
+    .left-sidebar::-webkit-scrollbar {
+        display: none; /* 스크롤바 숨김 (Chrome/Safari) */
+    }
+
+    .group-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        letter-spacing: 1.5px;
+    }
+
+    .menu-group {
+        margin-bottom: 2.5rem;
+    }
+
+    .menu-item {
+        display: block;
+        padding: 0.5rem 0.8rem;
+        margin-left: -0.8rem;
+        border-radius: 6px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .menu-item:hover {
+        background: var(--hover-bg);
+        color: var(--text-primary);
+    }
+
+    .menu-item.active {
+        color: var(--text-primary);
+        font-weight: 700;
+        background: var(--hover-bg);
+    }
+
+    /* Accordion Category Styles */
+    .category-folder {
+        margin-bottom: 0.2rem;
+    }
+    
+    .folder-title {
+        cursor: pointer;
+        user-select: none;
+        list-style: none; /* Hide default arrow */
+        display: flex;
+        align-items: center;
+        /* 패딩을 일반 메뉴와 똑같이 맞춰서 왼쪽 정렬 유지 */
+        padding-left: 0.8rem !important; 
+    }
+    
+    .folder-title::-webkit-details-marker {
+        display: none;
+    }
+    
+    .folder-title::before {
+        content: '>';
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        display: inline-block;
+        margin-right: 0.5rem; /* 아이콘과 텍스트 사이 간격 */
+        transition: transform 0.2s ease-in-out;
+        transform-origin: center;
+        color: var(--text-secondary);
+    }
+    
+    /* 열렸을 때 > 모양이 아래를 향하도록 90도 회전 */
+    details[open] .folder-title::before {
+        transform: rotate(90deg);
+    }
+    
+    .folder-content {
+        padding-left: 1.5rem; /* 원래대로 복구 */
+        margin-top: 0.2rem;
+        border-left: 1px solid var(--border-color);
+        margin-left: 0.4rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .sub-item {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+        .left-sidebar {
+            display: none; 
+        }
+    }
+</style>
