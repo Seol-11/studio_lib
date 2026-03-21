@@ -86,16 +86,18 @@ const {
         --border-color: rgba(0, 0, 0, 0.08);
         --hover-bg: rgba(0, 0, 0, 0.04);
         --accent-color: #333;
+        --signature-color: #84a98c; /* 소프트 말차 (Light) */
     }
 
     html.dark {
-        --bg-color: #121212; 
-        --container-bg: rgba(30, 30, 30, 0.6); 
-        --text-primary: #EEEEEE; 
-        --text-secondary: #999999; 
-        --border-color: rgba(255, 255, 255, 0.08); 
-        --hover-bg: rgba(255, 255, 255, 0.04);
-        --accent-color: #ccc;
+        --bg-color: #121212;
+        --container-bg: rgba(30, 30, 30, 0.6);
+        --text-primary: #EEEEEE;
+        --text-secondary: #999999;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --hover-bg: rgba(255, 255, 255, 0.05);
+        --accent-color: #ddd;
+        --signature-color: #b2e0b2; /* 화사한 말차 (Dark) */
     }
 
     body {
@@ -175,7 +177,7 @@ const {
     /* Main Content */
     .main-content {
         min-width: 0;
-        padding: 3rem 0; /* 심플한 타이포그래피 집중을 위해 좌우 여백을 없애고 위아래 여백만 유지 */
+        padding: 0 0 3rem 0; /* 심플한 타이포그래피 집중을 위해 좌우 여백을 없애고 아래 여백만 유지 */
     }
 
     .toc-placeholder {

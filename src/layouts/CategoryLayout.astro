@@ -1,0 +1,98 @@
+---
+import BlogLayout from './BlogLayout.astro';
+import PostList from '../components/PostList.astro';
+
+const { frontmatter } = Astro.props;
+
+// 모든 블로그 포스트 가져오기
+const allPosts = await Astro.glob('../pages/blog/**/*.md');
+
+// 메인 화면용, 카테고리용 md 파일 제외, 그리고 이 카테고리에 맞는 포스트만 필터링
+const posts = allPosts.filter(post => {
+    if (post.file.endsWith('_blog-index.md') || post.frontmatter.isCategory) return false;
+    
+    const postCategory = post.frontmatter.category;
+    if (!postCategory) return false;
+    
+    if (Array.isArray(postCategory)) {
+        return postCategory.includes(frontmatter.categoryId);
+    }
+    return postCategory === frontmatter.categoryId;
+});
+
+// 최신순 정렬
+const sortedPosts = posts.sort((a, b) => {
+    const dateA = new Date(a.frontmatter.date || 0).valueOf();
+    const dateB = new Date(b.frontmatter.date || 0).valueOf();
+    return dateB - dateA;
+});
+---
+
+<BlogLayout title={`${frontmatter.title} | Studio.lib`} description={frontmatter.description}>
+    <div class="category-header">
+        <h1 class="category-title">{frontmatter.title}</h1>
+        {frontmatter.description && <p class="category-meta">{frontmatter.description}</p>}
+    </div>
+    
+    <div class="category-intro-content">
+        <slot />
+    </div>
+
+    <div class="category-posts-section">
+        <h2 class="section-title">Related Posts</h2>
+        <PostList posts={sortedPosts} />
+    </div>
+</BlogLayout>
+
+<style>
+    .category-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .category-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0 0 0.5rem 0;
+        letter-spacing: -0.5px;
+    }
+    .category-meta {
+        color: var(--text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    .category-intro-content {
+        margin-bottom: 4rem;
+        line-height: 1.7;
+        font-size: 1.05rem;
+        color: var(--text-primary);
+    }
+    :global(.category-intro-content h2) {
+        font-size: 1.8rem;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    :global(.category-intro-content p) {
+        margin-bottom: 1.5rem;
+    }
+    :global(.category-intro-content a) {
+        color: #3b82f6;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+    }
+    .category-posts-section {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px dashed var(--border-color);
+    }
+    .section-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: var(--text-primary);
+    }
+</style>

@@ -4,6 +4,7 @@ title: "나의 첫 번째 블로그 포스트"
 date: "2026-03-16"
 description: "Astro를 이용해 마크다운 기반의 블로그를 세팅했습니다."
 tags: ["log", "astro", "env"]
+category: "env"
 ---
 
 안녕하세요! 

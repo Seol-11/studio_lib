@@ -1,8 +1,13 @@
 ---
 import BlogLayout from '../../layouts/BlogLayout.astro';
+import PostList from '../../components/PostList.astro';
+import * as BlogIndex from './_blog-index.md';
 
 // pages/blog 디렉토리 내부의 모든 마크다운 파일을 가져옵니다.
-const posts = await Astro.glob('./*.md');
+const allPosts = await Astro.glob('./**/*.md');
+
+// 메인 화면용, 카테고리용 마크다운 파일은 포스트 목록에서 제외합니다.
+const posts = allPosts.filter(post => !post.file.endsWith('_blog-index.md') && !post.frontmatter.isCategory);
 
 // 날짜 기준으로 내림차순 정렬 (최신 글이 위로)
 const sortedPosts = posts.sort((a, b) => {
@@ -13,144 +18,59 @@ const sortedPosts = posts.sort((a, b) => {
 ---
 
 <BlogLayout title="Blog | Studio.lib">
-    <div class="post-header">
-        <h1 class="post-title">Analog Log</h1>
-        <p class="post-meta">일상적인 취미, 음악, 영화부터 가벼운 스터디 노트까지.</p>
+    <div class="category-header">
+        <h1 class="category-title">{BlogIndex.frontmatter.title}</h1>
+        {BlogIndex.frontmatter.description && <p class="category-meta">{BlogIndex.frontmatter.description}</p>}
     </div>
 
-    <div class="post-list">
-        {sortedPosts.length === 0 ? (
-            <p class="empty-state">아직 작성된 글이 없습니다. src/pages/blog 폴더에 마크다운(.md) 파일을 추가해보세요!</p>
-        ) : (
-            sortedPosts.map(post => (
-                <article class="post-item">
-                    <div class="post-date">{post.frontmatter.date || 'No Date'}</div>
-                    {post.frontmatter.heroImage && (
-                        <a href={post.url} class="post-thumb-link">
-                            <img src={post.frontmatter.heroImage} alt={post.frontmatter.title} class="post-thumb" />
-                        </a>
-                    )}
-                    <a href={post.url} class="post-link">
-                        <h2>{post.frontmatter.title}</h2>
-                    </a>
-                    {post.frontmatter.description && <p class="post-excerpt">{post.frontmatter.description}</p>}
-                    {post.frontmatter.tags && (
-                        <div class="post-tags">
-                            {post.frontmatter.tags.map((tag: string) => (
-                                <span class="tag">#{tag}</span>
-                            ))}
-                        </div>
-                    )}
-                </article>
-            ))
-        )}
+    <div class="blog-index-content">
+        <BlogIndex.Content />
     </div>
+
+    <PostList posts={sortedPosts} />
 </BlogLayout>
 
 <style>
-    .empty-state {
-        color: var(--text-secondary);
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.9rem;
-        padding: 2rem 0;
-    }
-    .post-header {
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
+    .category-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
         border-bottom: 1px solid var(--border-color);
     }
-    .post-title {
-        font-size: 2.5rem;
+    .category-title {
+        font-size: 1.8rem;
         font-weight: 800;
         margin: 0 0 0.5rem 0;
-        letter-spacing: -1px;
+        letter-spacing: -0.5px;
     }
-    .post-meta {
+    .category-meta {
         color: var(--text-secondary);
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.9rem;
         margin: 0;
     }
 
-    .post-list {
-        display: flex;
-        flex-direction: column;
-        gap: 2.5rem;
-    }
-
-    .post-item {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .post-date {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-    }
-
-    .post-thumb-link {
-        display: block;
-        margin-top: 0.5rem;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid var(--border-color);
-        transition: border-color 0.2s ease;
-    }
-    
-    .post-thumb-link:hover {
-        border-color: var(--text-secondary);
-    }
-
-    .post-thumb {
-        width: 100%;
-        height: auto;
-        max-height: 250px;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.3s ease;
-    }
-
-    .post-thumb-link:hover .post-thumb {
-        transform: scale(1.02);
-    }
-
-    .post-link {
-        text-decoration: none;
+    .blog-index-content {
+        margin-bottom: 4rem;
+        line-height: 1.7;
+        font-size: 1.05rem;
         color: var(--text-primary);
     }
-
-    .post-link h2 {
-        font-size: 1.5rem;
+    
+    :global(.blog-index-content h2) {
+        font-size: 1.8rem;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
         font-weight: 700;
-        margin: 0;
-        transition: color 0.2s ease;
+        letter-spacing: -0.5px;
     }
-
-    .post-link:hover h2 {
-        color: var(--text-secondary);
+    
+    :global(.blog-index-content p) {
+        margin-bottom: 1rem;
     }
-
-    .post-excerpt {
-        color: var(--text-secondary);
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin: 0;
-    }
-
-    .post-tags {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-
-    .tag {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        background: var(--border-color);
-        border-radius: 4px;
-        color: var(--text-secondary);
+    
+    :global(.blog-index-content a) {
+        color: var(--signature-color);
+        text-decoration: underline;
+        text-underline-offset: 4px;
     }
 </style>

@@ -1,5 +1,33 @@
 ---
 // src/components/BlogSidebar.astro
+
+// ==========================================
+// 📌 카테고리 설정 (여기만 수정하시면 됩니다!)
+// ==========================================
+const categories = [
+    {
+        type: 'folder',
+        id: 'log',
+        title: 'Daily Log (일상)',
+        items: [
+            { title: '일기', path: '/blog/log/diary' },
+            { title: '음악', path: '/blog/log/music' },
+            { title: '요리', path: '/blog/log/cooking' }
+        ]
+    },
+    {
+        type: 'folder',
+        id: 'study',
+        title: 'Study Notes (공부)',
+        items: [
+            { title: 'Architecture', path: '/blog/study/arch' },
+            { title: 'RTL Design', path: '/blog/study/rtl' }
+        ]
+    },
+    { type: 'link', title: 'Environment (환경세팅)', path: '/blog/env' },
+    { type: 'link', title: 'Projects (기획)', path: '/blog/project' }
+];
+// ==========================================
 ---
 
 <aside class="left-sidebar">
@@ -13,25 +41,24 @@
         <div class="menu-group">
             <div class="group-title">CATEGORIES</div>
             
-            <details class="category-folder" data-folder-id="log">
-                <summary class="menu-item folder-title">Daily Log (일상)</summary>
-                <div class="folder-content">
-                    <a href="/blog/log/diary" class="menu-item sub-item">일기</a>
-                    <a href="/blog/log/music" class="menu-item sub-item">음악</a>
-                    <a href="/blog/log/cooking" class="menu-item sub-item">요리</a>
-                </div>
-            </details>
-
-            <details class="category-folder" data-folder-id="study">
-                <summary class="menu-item folder-title">Study Notes (공부)</summary>
-                <div class="folder-content">
-                    <a href="/blog/study/arch" class="menu-item sub-item">Architecture</a>
-                    <a href="/blog/study/rtl" class="menu-item sub-item">RTL Design</a>
-                </div>
-            </details>
-
-            <a href="/blog/env" class="menu-item">Environment (환경세팅)</a>
-            <a href="/blog/project" class="menu-item">Projects (기획)</a>
+            {categories.map(category => {
+                if (category.type === 'folder') {
+                    return (
+                        <details class="category-folder" data-folder-id={category.id}>
+                            <summary class="menu-item folder-title">{category.title}</summary>
+                            <div class="folder-content">
+                                {category.items.map(item => (
+                                    <a href={item.path} class="menu-item sub-item">{item.title}</a>
+                                ))}
+                            </div>
+                        </details>
+                    );
+                } else if (category.type === 'link') {
+                    return (
+                        <a href={category.path} class="menu-item">{category.title}</a>
+                    );
+                }
+            })}
         </div>
     </nav>
 </aside>
@@ -175,6 +202,20 @@
     @media (max-width: 768px) {
         .left-sidebar {
             display: none; 
+        }
+        .left-sidebar.mobile-open {
+            display: block;
+            position: fixed;
+            top: 60px; /* Header height */
+            left: 0;
+            width: 260px;
+            height: calc(100vh - 60px);
+            max-height: none;
+            background: var(--bg-color);
+            border-right: 1px solid var(--border-color);
+            z-index: 999;
+            padding: 2rem 1.5rem;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
         }
     }
 </style>

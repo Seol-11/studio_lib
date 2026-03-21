@@ -1,0 +1,300 @@
+---
+export interface Props {
+    posts: any[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="post-list-wrapper">
+    <div class="post-list" id="post-list-container">
+        {posts.length === 0 ? (
+            <p class="empty-state">아직 작성된 글이 없습니다.</p>
+        ) : (
+            posts.map(post => (
+                <article 
+                    class="post-item" 
+                    data-title={post.frontmatter.title} 
+                    data-tags={(post.frontmatter.tags || []).join(',')}
+                >
+                    <div class="post-date">{post.frontmatter.date || 'No Date'}</div>
+                    {post.frontmatter.heroImage && (
+                        <a href={post.url} class="post-thumb-link">
+                            <img src={post.frontmatter.heroImage} alt={post.frontmatter.title} class="post-thumb" />
+                        </a>
+                    )}
+                    <a href={post.url} class="post-link">
+                        <h2>{post.frontmatter.title}</h2>
+                    </a>
+                    {post.frontmatter.description && <p class="post-excerpt">{post.frontmatter.description}</p>}
+                    {post.frontmatter.tags && (
+                        <div class="post-tags">
+                            {post.frontmatter.tags.map((tag: string) => (
+                                <span class="tag">#{tag}</span>
+                            ))}
+                        </div>
+                    )}
+                </article>
+            ))
+        )}
+        <div id="no-results" class="empty-state" style="display: none;">검색 결과가 없습니다.</div>
+    </div>
+
+    {posts.length > 0 && (
+        <div class="post-controls">
+            <input type="text" id="post-search" placeholder="글 제목, 태그 검색..." />
+        </div>
+    )}
+
+    <div class="pagination" id="pagination-container"></div>
+</div>
+
+<script is:inline>
+    // Astro의 ViewTransition이 없다면 DOMContentLoaded로 충분합니다.
+    document.addEventListener('DOMContentLoaded', () => {
+        const ITEMS_PER_PAGE = 5; // 한 페이지당 표시할 글 수
+        const searchInput = document.getElementById('post-search');
+        const postItems = Array.from(document.querySelectorAll('.post-item'));
+        const paginationContainer = document.getElementById('pagination-container');
+        const noResults = document.getElementById('no-results');
+
+        if (!postItems.length) return; // 글이 없으면 스크립트 종료
+
+        let currentPage = 1;
+        let filteredItems = [...postItems];
+
+        function render() {
+            const query = searchInput ? searchInput.value.toLowerCase() : '';
+
+            // 1. 필터링
+            filteredItems = postItems.filter(item => {
+                const title = (item.dataset.title || '').toLowerCase();
+                const tags = (item.dataset.tags || '').toLowerCase();
+                
+                return title.includes(query) || tags.includes(query);
+            });
+
+            // 2. 페이지네이션 계산
+            const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+            if (currentPage > totalPages) currentPage = totalPages || 1;
+
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+
+            // 3. UI 업데이트
+            postItems.forEach(item => {
+                item.style.display = 'none';
+            });
+            
+            if (filteredItems.length === 0) {
+                if (noResults) noResults.style.display = 'block';
+                if (paginationContainer) paginationContainer.innerHTML = '';
+            } else {
+                if (noResults) noResults.style.display = 'none';
+                filteredItems.slice(startIndex, endIndex).forEach(item => {
+                    item.style.display = 'flex'; // 기존 .post-item의 display 방식 복구
+                });
+                renderPagination(totalPages);
+            }
+        }
+
+        function renderPagination(totalPages) {
+            if (!paginationContainer) return;
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            // 이전 버튼
+            html += `<button class="page-btn nav-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button>`;
+            
+            // 숫자 버튼
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+
+            // 다음 버튼
+            html += `<button class="page-btn nav-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>&gt;</button>`;
+            
+            paginationContainer.innerHTML = html;
+
+            // 이벤트 리스너 부착
+            paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (btn.hasAttribute('disabled')) return;
+                    currentPage = parseInt(e.target.dataset.page);
+                    render();
+                    
+                    // 리스트의 맨 위로 부드럽게 스크롤
+                    const listWrapper = document.querySelector('.post-list-wrapper');
+                    if (listWrapper) {
+                        const top = listWrapper.getBoundingClientRect().top + window.scrollY - 100;
+                        window.scrollTo({ top, behavior: 'smooth' });
+                    }
+                });
+            });
+        }
+
+        // 입력 및 선택 시 첫 페이지로 리셋 후 렌더링
+        if (searchInput) {
+            searchInput.addEventListener('input', () => { 
+                currentPage = 1; 
+                render(); 
+            });
+        }
+
+        // 초기 렌더링
+        render();
+    });
+</script>
+
+<style>
+    .post-list-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    /* 필터 컨트롤 */
+    .post-controls {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    .post-controls input {
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--border-color);
+        background: transparent;
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        outline: none;
+        transition: border-color 0.2s ease;
+        flex: 1;
+        min-width: 200px;
+    }
+    .post-controls input:focus {
+        border-color: var(--text-secondary);
+    }
+
+    /* 글 목록 */
+    .post-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+    }
+    .post-item {
+        display: none; /* JS가 관리하므로 초기에는 none으로 설정될 수 있으나 스크립트 실행 전 FOUC 방지를 위해 위쪽에서는 그대로 두고 JS에서 제어 */
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .empty-state {
+        color: var(--text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        padding: 2rem 0;
+        text-align: center;
+    }
+    .post-date {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+    .post-thumb-link {
+        display: block;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: border-color 0.2s ease;
+    }
+    .post-thumb-link:hover {
+        border-color: var(--text-secondary);
+    }
+    .post-thumb {
+        width: 100%;
+        height: auto;
+        max-height: 250px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+    .post-thumb-link:hover .post-thumb {
+        transform: scale(1.02);
+    }
+    .post-link {
+        text-decoration: none;
+        color: var(--text-primary);
+    }
+    .post-link h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        transition: color 0.2s ease;
+    }
+    .post-link:hover h2 {
+        color: var(--signature-color);
+    }
+    .post-excerpt {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+    .post-tags {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        background: transparent;
+        border: 1px solid var(--signature-color);
+        border-radius: 4px;
+        color: var(--signature-color);
+    }
+
+    /* 페이지네이션 (JS 동적 생성 요소이므로 global 처리) */
+    :global(.pagination) {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    :global(.page-btn) {
+        appearance: none;
+        -webkit-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1rem;
+        transition: color 0.2s ease;
+        padding: 0.2rem 0.5rem;
+        margin: 0;
+    }
+    :global(.page-btn:hover:not([disabled])) {
+        color: var(--signature-color);
+    }
+    :global(.page-btn.active) {
+        color: var(--signature-color);
+        font-weight: bold;
+        text-decoration: underline;
+        text-decoration-color: var(--signature-color);
+        text-underline-offset: 4px;
+    }
+    :global(.page-btn[disabled]) {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+</style>

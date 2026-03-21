@@ -4,6 +4,7 @@ title: "NoC Routing & Arbitration 가벼운 복습"
 date: "2026-03-14"
 description: "Network-on-Chip (NoC)의 라우팅 알고리즘과 중재 방식에 대한 스터디 노트"
 tags: ["study", "noc", "arch", "rtl"]
+category: "study/arch"
 ---
 
 최근 멀티코어 및 칩렛(Chiplet) 구조가 각광받으면서, 내부 컴포넌트 간의 통신 병목을 해결하기 위한 **Network-on-Chip (NoC)** 설계의 중요성이 더욱 커지고 있다. 주말 동안 전공 서적을 훑어보며 NoC의 핵심 요소인 Routing과 Arbitration에 대해 가볍게 복습한 내용을 남겨둔다.

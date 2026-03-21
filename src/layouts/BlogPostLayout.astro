@@ -1,7 +1,25 @@
 ---
 import BlogLayout from './BlogLayout.astro';
+import PostList from '../components/PostList.astro';
 
 const { frontmatter, headings } = Astro.props;
+
+// 같은 카테고리의 포스트들을 불러오기
+const allPosts = await Astro.glob('../pages/blog/**/*.md');
+const currentPath = Astro.url.pathname;
+
+const categoryPosts = allPosts.filter(post => {
+    // 인덱스 및 카테고리 대문 파일 제외
+    if (post.file.endsWith('_blog-index.md') || post.frontmatter.isCategory) return false;
+    
+    // 현재 보고 있는 글은 리스트에서 제외
+    if (currentPath === post.url || currentPath === post.url + '/') return false;
+
+    // 현재 글과 카테고리가 같은 글만 필터링
+    return post.frontmatter.category && frontmatter.category && 
+           post.frontmatter.category === frontmatter.category;
+})
+.sort((a, b) => new Date(b.frontmatter.date || 0).valueOf() - new Date(a.frontmatter.date || 0).valueOf());
 ---
 <BlogLayout title={`${frontmatter.title} | Studio.lib`} description={frontmatter.description} headings={headings}>
     <article class="markdown-body">
@@ -23,6 +41,35 @@ const { frontmatter, headings } = Astro.props;
         <div class="post-content">
             <slot />
         </div>
+
+        {/* 지스커스 (Giscus) 댓글창 */}
+        <div class="comments-section">
+            <h3 class="section-subtitle">Comments</h3>
+            <p class="giscus-notice">※ <code>src/layouts/BlogPostLayout.astro</code> 하단에서 Giscus 저장소 정보를 본인 Github에 맞게 수정해주세요.</p>
+            <script src="https://giscus.app/client.js"
+                data-repo="[ENTER REPO HERE]"
+                data-repo-id="[ENTER REPO ID HERE]"
+                data-category="[ENTER CATEGORY HERE]"
+                data-category-id="[ENTER CATEGORY ID HERE]"
+                data-mapping="pathname"
+                data-strict="0"
+                data-reactions-enabled="1"
+                data-emit-metadata="0"
+                data-input-position="bottom"
+                data-theme="preferred_color_scheme"
+                data-lang="ko"
+                crossorigin="anonymous"
+                async>
+            </script>
+        </div>
+
+        {/* 카테고리 내 다른 글 목록 */}
+        {categoryPosts.length > 0 && (
+            <div class="category-posts-section">
+                <h3 class="section-subtitle">More from this category</h3>
+                <PostList posts={categoryPosts} />
+            </div>
+        )}
     </article>
 </BlogLayout>
 
@@ -37,11 +84,11 @@ const { frontmatter, headings } = Astro.props;
         padding-bottom: 2rem;
     }
     .post-title {
-        font-size: 2.5rem;
+        font-size: 1.8rem;
         font-weight: 800;
         margin: 0 0 1rem 0;
         line-height: 1.2;
-        letter-spacing: -1px;
+        letter-spacing: -0.5px;
     }
     .post-meta {
         display: flex;
@@ -52,7 +99,9 @@ const { frontmatter, headings } = Astro.props;
         color: var(--text-secondary);
     }
     .post-meta .tag {
-        background: var(--border-color);
+        background: transparent;
+        border: 1px solid var(--signature-color);
+        color: var(--signature-color);
         padding: 0.2rem 0.6rem;
         border-radius: 4px;
     }
@@ -97,7 +146,7 @@ const { frontmatter, headings } = Astro.props;
         margin-bottom: 1.5rem;
     }
     .post-content a {
-        color: #3b82f6;
+        color: var(--signature-color);
         text-decoration: underline;
         text-underline-offset: 4px;
     }
@@ -109,7 +158,7 @@ const { frontmatter, headings } = Astro.props;
         margin-bottom: 0.5rem;
     }
     .post-content blockquote {
-        border-left: 4px solid var(--border-color);
+        border-left: 4px solid var(--signature-color);
         padding-left: 1rem;
         color: var(--text-secondary);
         font-style: italic;
@@ -140,5 +189,27 @@ const { frontmatter, headings } = Astro.props;
         border-radius: 8px;
         margin: 1.5rem 0;
         border: 1px solid var(--border-color);
+    }
+
+    /* Category Posts & Comments Section */
+    .category-posts-section, .comments-section {
+        margin-top: 5rem;
+        padding-top: 2rem;
+        border-top: 1px dashed var(--border-color);
+    }
+    .section-subtitle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: var(--text-primary);
+    }
+    .giscus-notice {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        background: var(--hover-bg);
+        padding: 0.8rem;
+        border-radius: 6px;
+        margin-bottom: 2rem;
     }
 </style>

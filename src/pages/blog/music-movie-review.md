@@ -4,6 +4,7 @@ title: "주말의 휴식: 영화 '듄: 파트 2'와 코딩 플레이리스트"
 date: "2026-03-10"
 description: "영화 감상 후기와 작업할 때 듣는 Lo-fi 음악 추천"
 tags: ["log", "movie", "music", "hobby"]
+category: "log/music"
 ---
 
 코딩과 설계 스터디로 꽉 찬 평일을 보내고, 주말에는 뇌를 식힐 겸 영화관을 다녀왔다. 이번 주말의 선택은 오래 기다렸던 SF 대작, **'듄: 파트 2 (Dune: Part Two)'**.

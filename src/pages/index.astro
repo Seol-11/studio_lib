@@ -58,7 +58,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script is:inline>
-    document.addEventListener('astro:page-load', () => {
+    const initThemeToggle = () => {
         const toggleBtn = document.getElementById("theme-toggle");
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -68,7 +68,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             }
         };
 
-        mediaQuery.addEventListener('change', listener);
+        // Use addEventListener on matchMedia for newer browser support
+        if (mediaQuery.addEventListener) {
+            mediaQuery.addEventListener('change', listener);
+        } else {
+            mediaQuery.addListener(listener); // fallback for older browsers
+        }
 
         if (toggleBtn && !toggleBtn.dataset.init) {
             toggleBtn.dataset.init = "true";
@@ -77,7 +82,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 localStorage.setItem("theme", isNowDark ? "dark" : "light");
             });
         }
-    });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeToggle);
+    } else {
+        initThemeToggle();
+    }
 </script>
 
 <style>
