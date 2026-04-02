@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/BlogPostLayout.astro
+layout: ../../../layouts/BlogPostLayout.astro
 title: "NoC Routing & Arbitration 가벼운 복습"
 date: "2026-03-14"
 description: "Network-on-Chip (NoC)의 라우팅 알고리즘과 중재 방식에 대한 스터디 노트"

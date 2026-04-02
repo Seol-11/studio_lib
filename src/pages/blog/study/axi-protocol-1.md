@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/BlogPostLayout.astro
+layout: ../../../layouts/BlogPostLayout.astro
 title: "AMBA AXI 프로토콜 스터디 - 1"
 date: "2026-03-18"
 description: "ARM의 AMBA AXI 프로토콜의 기본 채널 구조와 Handshake 메커니즘 정리"

@@ -1,13 +1,16 @@
 ---
-layout: ../../layouts/BlogPostLayout.astro
+layout: ../../../layouts/BlogPostLayout.astro
 title: "나만의 파스타 레시피: 알리오 올리오"
 date: "2026-03-15"
 description: "주말 저녁을 책임지는 초간단 마늘 올리브 오일 파스타 만들기"
 tags: ["log", "cooking", "recipe"]
-category: "log/cooking"
+category: "log"
+heroImage: "/images/sample-food.jpg"
 ---
 
 코딩 하다가 배가 고파질 때, 배달 음식을 시키기보다는 직접 간단하게 요리해 먹는 것을 좋아한다. 그중에서도 가장 만만하고 맛있는 요리가 바로 알리오 올리오(Aglio e Olio)다.
+
+![완성된 알리오 올리오 파스타 모습](/images/sample-food.jpg)
 
 ## 재료 준비
 

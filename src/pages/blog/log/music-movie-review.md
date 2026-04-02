@@ -1,5 +1,5 @@
 ---
-layout: ../../layouts/BlogPostLayout.astro
+layout: ../../../layouts/BlogPostLayout.astro
 title: "주말의 휴식: 영화 '듄: 파트 2'와 코딩 플레이리스트"
 date: "2026-03-10"
 description: "영화 감상 후기와 작업할 때 듣는 Lo-fi 음악 추천"
