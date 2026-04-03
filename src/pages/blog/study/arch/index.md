@@ -1,5 +1,5 @@
 ---
-layout: ../../../layouts/CategoryLayout.astro
+layout: ../../../../layouts/CategoryLayout.astro
 title: "Architecture"
 description: "컴퓨터 구조와 시스템 아키텍처에 대한 스터디 노트입니다."
 isCategory: true

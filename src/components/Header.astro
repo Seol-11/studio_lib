@@ -96,7 +96,7 @@
             
             if (!searchData) {
                 try {
-                    const res = await fetch('/search.json');
+                    const res = await fetch('/blog/search.json');
                     searchData = await res.json();
                 } catch (e) {
                     console.error('Failed to load search data', e);
