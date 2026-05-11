@@ -1,6 +1,6 @@
 export async function GET() {
   // src/pages/blog 폴더 내부의 모든 마크다운 파일을 가져옵니다.
-  const posts = import.meta.glob('./blog/*.md', { eager: true });
+  const posts = import.meta.glob('./**/*.md', { eager: true });
   
   const searchIndex = Object.values(posts).map((post) => {
     return {

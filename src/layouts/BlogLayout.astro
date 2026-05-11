@@ -18,21 +18,20 @@ const {
 <BaseLayout title={title} description={description}>
     <Header />
 
-    <div class="blog-wrapper">
-        <div class="blog-container">
-            
-            <!-- Left: Index Navigation Component -->
-            <BlogSidebar />
+    <div class="lucode-container">
+        <!-- Left: Navigation Sidebar -->
+        <BlogSidebar />
 
+        <div class="lucode-main-wrapper">
             <!-- Center: Main Content -->
-            <main class="main-content">
+            <main class="lucode-content">
                 <slot />
             </main>
 
-            <!-- Right: Extra / TOC placeholder -->
-            <aside class="right-sidebar">
-                <div class="toc-container">
-                    <div class="group-title">ON_THIS_PAGE</div>
+            <!-- Right: TOC Sidebar -->
+            <aside class="lucode-toc-sidebar">
+                <div class="toc-inner">
+                    <h2 class="group-title">ON_THIS_PAGE</h2>
                     {headings && headings.length > 0 ? (
                         <nav class="toc-nav">
                             {headings.map((heading) => (
@@ -42,167 +41,155 @@ const {
                             ))}
                         </nav>
                     ) : (
-                        <div class="toc-placeholder">
-                            <span>Index empty</span>
-                        </div>
+                        <div class="toc-placeholder">index empty</div>
                     )}
                 </div>
             </aside>
-
         </div>
     </div>
 
     <script is:inline>
         document.addEventListener('DOMContentLoaded', () => {
-            // TOC Smooth scroll & history state prevention
             const tocLinks = document.querySelectorAll('.toc-link');
+            const headings = Array.from(document.querySelectorAll('h1[id], h2[id], h3[id], h4[id]'));
+            
+            // Smooth Scroll
             tocLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
-                    // Astro.js의 기본 라우팅이나 브라우저 기본 동작 완벽 차단
                     e.preventDefault();
-                    e.stopPropagation();
-
                     const targetId = link.getAttribute('href').substring(1);
                     const targetElement = document.getElementById(targetId);
                     
                     if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth' });
-                        // history.pushState 대신 replaceState를 사용하여 뒤로가기 스택에 쌓이지 않게 함
+                        const offset = 80;
+                        const elementPosition = targetElement.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - offset;
+                        
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                         window.history.replaceState(null, null, `#${targetId}`);
                     }
                 });
             });
+
+            // Intersection Observer for Active State
+            const observerOptions = {
+                rootMargin: '-80px 0px -70% 0px',
+                threshold: 1.0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        tocLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            headings.forEach(h => observer.observe(h));
         });
     </script>
 </BaseLayout>
 
-<style is:global>
-    /* Global Theme Variables for Blog */
-    :root {
-        --bg-color: #FDFCF8;
-        --container-bg: rgba(255, 255, 255, 0.6);
-        --text-primary: #111;
-        --text-secondary: #666;
-        --border-color: rgba(0, 0, 0, 0.08);
-        --hover-bg: rgba(0, 0, 0, 0.04);
-        --accent-color: #333;
-        --signature-color: #84a98c; /* 소프트 말차 (Light) */
-    }
-
-    html.dark {
-        --bg-color: #121212;
-        --container-bg: rgba(30, 30, 30, 0.6);
-        --text-primary: #EEEEEE;
-        --text-secondary: #999999;
-        --border-color: rgba(255, 255, 255, 0.08);
-        --hover-bg: rgba(255, 255, 255, 0.05);
-        --accent-color: #ddd;
-        --signature-color: #b2e0b2; /* 화사한 말차 (Dark) */
-    }
-
-    body {
-        background: var(--bg-color);
-        color: var(--text-primary);
-        transition: background-color 0.3s ease;
-    }
-</style>
-
 <style>
-    .blog-wrapper {
-        min-height: 100vh;
-        padding-top: 60px; /* Header offset */
+    .lucode-container {
         display: flex;
-        justify-content: center;
-    }
-
-    .blog-container {
         width: 100%;
-        max-width: 1400px;
-        display: grid;
-        grid-template-columns: 240px minmax(0, 1fr) 240px;
-        gap: 3rem;
-        padding: 3rem 2rem;
-        align-items: start; /* Grid item 높이를 내용물에 맞추어 sticky 작동 보장 */
+        max-width: 1600px;
+        margin: 0 auto;
+        min-height: 100vh;
+        padding-top: 3.5rem; /* Header height */
     }
 
-    /* Main Content */
-    .main-content {
+    /* main wrapper constraints center content and right TOC */
+    .lucode-main-wrapper {
+        flex: 1;
+        display: flex;
         min-width: 0;
-        padding: 0; /* 좌우 여백 없이 타이포그래피 집중 */
     }
 
-    .right-sidebar {
-        position: sticky;
-        top: calc(60px + 3rem); /* 헤더 높이(60px) + 컨테이너 상단 여백(3rem). 0px 유격 완벽 고정 */
-        align-self: start;
-        height: max-content;
-        max-height: calc(100vh - 60px - 3rem - 2rem); /* 뷰포트 하단 여백 확보 */
-        overflow-y: auto;
-        padding-right: 1rem;
-        scrollbar-width: none; /* 사이드바 스크롤바 숨김 */
+    .lucode-content {
+        flex: 1;
+        min-width: 0;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 4rem 4rem 6rem;
     }
-    .right-sidebar::-webkit-scrollbar {
+
+    .lucode-toc-sidebar {
         display: none;
+        width: 18rem;
+        flex-shrink: 0;
+        position: sticky;
+        top: 3.5rem;
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+        padding: 3rem 2rem 3rem 2rem;
+        border-left: none; /* Removed border */
+    }
+
+    @media (min-width: 1280px) {
+        .lucode-toc-sidebar {
+            display: block;
+        }
     }
 
     .group-title {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 700;
-        color: var(--text-secondary);
+        color: var(--foreground);
+        opacity: 0.6;
         margin-bottom: 1rem;
-        letter-spacing: 1.5px;
+        letter-spacing: 1px;
     }
 
-    /* TOC Styles */
     .toc-nav {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.6rem;
     }
+
     .toc-link {
-        color: var(--text-secondary);
+        font-size: 0.8rem; /* Decreased font size */
+        color: var(--muted-foreground);
         text-decoration: none;
-        font-size: 0.85rem;
         line-height: 1.4;
-        transition: color 0.2s ease;
+        transition: color 0.15s;
+        border-left: none; /* Removed border */
+        padding-left: 0; /* Adjusted padding */
+        margin-left: 0;
     }
+
     .toc-link:hover {
-        color: var(--text-primary);
+        color: var(--foreground);
     }
-    .toc-link.depth-2 { padding-left: 0; font-weight: 700; }
+
+    .toc-link.active {
+        color: var(--signature-color);
+        font-weight: 600;
+    }
+
     .toc-link.depth-3 { padding-left: 0.8rem; }
     .toc-link.depth-4 { padding-left: 1.6rem; }
 
-    /* Main Content */
-    .main-content {
-        min-width: 0;
-        padding: 0 0 3rem 0; /* 심플한 타이포그래피 집중을 위해 좌우 여백을 없애고 아래 여백만 유지 */
-    }
-
     .toc-placeholder {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
+        font-size: 0.8rem;
+        color: var(--muted-foreground);
         font-style: italic;
     }
 
-    /* Responsive */
     @media (max-width: 1024px) {
-        .blog-container {
-            grid-template-columns: 220px minmax(0, 1fr);
-        }
-        .right-sidebar {
-            display: none;
+        .lucode-container {
+            flex-direction: column;
         }
     }
 
     @media (max-width: 768px) {
-        .blog-container {
-            grid-template-columns: minmax(0, 1fr);
-            padding: 2rem 1.5rem;
-        }
-        .main-content {
-            padding: 1rem 0;
+        .lucode-content {
+            padding: 2rem 1.5rem 4rem;
         }
     }
 </style>

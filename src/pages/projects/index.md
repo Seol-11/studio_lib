@@ -1,5 +1,5 @@
 ---
-layout: ../../../layouts/CategoryLayout.astro
+layout: ../../layouts/CategoryLayout.astro
 title: "Projects (기획)"
 description: "개인 프로젝트 기획과 개발 과정을 기록합니다."
 isCategory: true

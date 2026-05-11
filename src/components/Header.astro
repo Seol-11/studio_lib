@@ -4,12 +4,12 @@
 <header class="sys-header" transition:persist="blog-header">
     <div class="header-inner">
         <div class="nav-left">
-            <a href="/blog" class="brand">Studio.lib</a>
+            <a href="/" class="brand">Studio.lib</a>
         </div>
         
         <div class="nav-right">
             <nav class="main-nav">
-                <a href="/blog" class="nav-item">Blog</a>
+                <a href="/" class="nav-item">Blog</a>
                 <a href="/archive" class="nav-item">Archive</a>
                 <a href="/contact" class="nav-item">Contact</a>
             </nav>
@@ -23,7 +23,7 @@
                 <svg class="moon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </button>
 
-            <!-- Mobile Menu Toggle (Now acts as Category Toggle) -->
+            <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
@@ -67,11 +67,11 @@
             }
         });
 
-        // Mobile Menu Logic (Toggles Category Sidebar)
+        // Mobile Menu Logic
         const mobileBtn = document.getElementById('mobile-menu-btn');
         if (mobileBtn) {
             mobileBtn.addEventListener('click', () => {
-                const leftSidebar = document.querySelector('.left-sidebar');
+                const leftSidebar = document.querySelector('.lucode-sidebar') || document.querySelector('.left-sidebar');
                 if (leftSidebar) {
                     leftSidebar.classList.toggle('mobile-open');
                 }
@@ -96,7 +96,7 @@
             
             if (!searchData) {
                 try {
-                    const res = await fetch('/blog/search.json');
+                    const res = await fetch('/search.json');
                     searchData = await res.json();
                 } catch (e) {
                     console.error('Failed to load search data', e);
@@ -170,7 +170,7 @@
         top: 0;
         left: 0;
         width: 100%;
-        background: var(--header-bg, rgba(253, 252, 248, 0.7));
+        background: var(--bg-color, rgba(253, 252, 248, 0.7));
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
@@ -182,13 +182,12 @@
         transition: background-color 0.3s ease;
     }
     :global(html.dark) .sys-header {
-        background: var(--header-bg, rgba(18, 18, 18, 0.7));
-        border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.08));
+        background: var(--bg-color, rgba(26, 26, 26, 0.7));
     }
 
     .header-inner {
         width: 100%;
-        max-width: 1400px;
+        max-width: 1600px;
         height: 60px;
         padding: 0 2rem;
         display: flex;
@@ -200,13 +199,20 @@
         font-family: 'JetBrains Mono', monospace;
         font-weight: 800;
         font-size: 1.2rem;
-        color: var(--text-primary);
+        color: var(--foreground);
         text-decoration: none;
         letter-spacing: -0.5px;
         transition: color 0.2s ease;
     }
     .brand:hover {
         color: var(--signature-color);
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-left: 0.5rem; /* Aligns with sidebar category items */
     }
 
     .nav-right {
@@ -223,7 +229,7 @@
     .nav-item {
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.85rem;
-        color: var(--text-secondary);
+        color: var(--muted-foreground);
         text-decoration: none;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -238,7 +244,7 @@
     .search-btn, .theme-toggle-btn, .mobile-menu-btn {
         background: none;
         border: none;
-        color: var(--text-secondary);
+        color: var(--muted-foreground);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -249,8 +255,8 @@
     }
 
     .search-btn:hover, .theme-toggle-btn:hover, .mobile-menu-btn:hover {
-        color: var(--text-primary);
-        background: var(--border-color);
+        color: var(--foreground);
+        background: var(--muted);
     }
 
     .mobile-menu-btn {
@@ -300,7 +306,7 @@
         border-bottom: 1px solid var(--border-color);
     }
     .search-icon {
-        color: var(--text-secondary);
+        color: var(--muted-foreground);
         margin-right: 1rem;
     }
     .search-input-wrapper input {
@@ -308,14 +314,14 @@
         background: transparent;
         border: none;
         font-size: 1.1rem;
-        color: var(--text-primary);
+        color: var(--foreground);
         outline: none;
         font-family: 'Inter', sans-serif;
     }
     .close-search-btn {
-        background: var(--border-color);
+        background: var(--muted);
         border: none;
-        color: var(--text-secondary);
+        color: var(--muted-foreground);
         font-size: 0.7rem;
         padding: 0.2rem 0.5rem;
         border-radius: 4px;
@@ -326,38 +332,38 @@
         max-height: 400px;
         overflow-y: auto;
         padding: 1rem 0;
-        background: var(--bg-color); /* Ensure background is solid */
+        background: var(--bg-color);
     }
     :global(.search-empty) {
         padding: 2rem;
         text-align: center;
-        color: var(--text-secondary);
+        color: var(--muted-foreground);
         font-size: 0.9rem;
     }
     :global(.search-result-item) {
         display: block;
         padding: 0.8rem 1.5rem;
         text-decoration: none !important;
-        color: var(--text-primary) !important;
-        background: transparent; /* Reset default link background */
+        color: var(--foreground) !important;
+        background: transparent;
         border-left: 3px solid transparent;
         transition: background 0.2s, border-color 0.2s;
     }
     :global(.search-result-item:hover) {
-        background: var(--hover-bg, rgba(0,0,0,0.05));
-        border-left-color: var(--text-primary);
-        color: var(--text-primary) !important; /* Force color on hover */
+        background: var(--muted);
+        border-left-color: var(--foreground);
+        color: var(--foreground) !important;
         text-decoration: none !important;
     }
     :global(.search-result-title) {
-        color: var(--text-primary);
+        color: var(--foreground);
         font-weight: 700;
         margin-bottom: 0.2rem;
         text-decoration: none !important;
-        display: block; /* Ensure it stays clean */
+        display: block;
     }
     :global(.search-result-desc) {
-        color: var(--text-secondary);
+        color: var(--muted-foreground);
         font-size: 0.85rem;
         white-space: nowrap;
         overflow: hidden;

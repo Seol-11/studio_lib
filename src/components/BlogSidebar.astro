@@ -1,44 +1,46 @@
 ---
-import { categories } from '../pages/blog/_categories';
+import { categories } from '../pages/_categories';
 
 // src/components/BlogSidebar.astro
 ---
 
-<aside class="left-sidebar">
-    <nav class="index-menu">
-        <div class="menu-group">
-            <div class="group-title">ROUTING_TABLE</div>
-            <a href="/" class="menu-item">/root (Home)</a>
-            <a href="/blog" class="menu-item">/blog (Index)</a>
-        </div>
-        
-        <div class="menu-group">
-            <div class="group-title">CATEGORIES</div>
-            
-            {categories.map(category => {
-                if (category.type === 'folder') {
-                    return (
-                        <details class="category-folder" data-folder-id={category.id}>
-                            <summary class="menu-item folder-title">{category.title}</summary>
-                            <div class="folder-content">
+<aside class="lucode-sidebar">
+    <nav class="lucode-sidebar-nav">
+        <div class="group-title">CATEGORIES</div>
+        <!-- Categories -->
+        {categories.map(category => {
+            if (category.type === 'folder' || category.type === 'category') {
+                return (
+                    <details class="category-folder" data-folder-id={category.id || category.title}>
+                        <summary class="sidebar-group-title">{category.title}</summary>
+                        <div class="folder-content">
+                            <ul class="sidebar-list">
                                 {category.items.map(item => (
-                                    <a href={item.path} class="menu-item sub-item">{item.title}</a>
+                                    <li>
+                                        <a href={item.path} class="sidebar-link">{item.title}</a>
+                                    </li>
                                 ))}
-                            </div>
-                        </details>
-                    );
-                } else if (category.type === 'link') {
-                    return (
-                        <a href={category.path} class="menu-item">{category.title}</a>
-                    );
-                }
-            })}
-        </div>
+                            </ul>
+                        </div>
+                    </details>
+                );
+            } else if (category.type === 'link') {
+                return (
+                    <div class="sidebar-group">
+                        <ul class="sidebar-list no-indent">
+                            <li>
+                                <a href={category.path} class="sidebar-link top-level">{category.title}</a>
+                            </li>
+                        </ul>
+                    </div>
+                );
+            }
+        })}
     </nav>
 </aside>
 
 <script is:inline>
-    // FOUC 방지를 위해 DOMContentLoaded를 기다리지 않고 즉시 실행하여 상태 복원
+    // FOUC 방지 및 폴더 상태 유지
     (function() {
         const folders = document.querySelectorAll('.category-folder');
         folders.forEach(folder => {
@@ -59,137 +61,159 @@ import { categories } from '../pages/blog/_categories';
     })();
 
     document.addEventListener('DOMContentLoaded', () => {
-        // 현재 경로에 따라 활성화된 메뉴 강조
-        const currentPath = window.location.pathname;
-        const menuItems = document.querySelectorAll('.left-sidebar .menu-item:not(.folder-title)');
-        menuItems.forEach(item => {
-            const href = item.getAttribute('href');
-            // 정확한 일치 혹은 서브 경로일 때 active
-            if (href === currentPath || (href !== '/' && href !== '/blog' && currentPath.startsWith(href))) {
-                item.classList.add('active');
-            } else if (href === '/blog' && currentPath === '/blog/') {
-                item.classList.add('active'); // astro index.html 특성 대응
+        const currentPath = window.location.pathname.replace(/\/$/, '');
+        const links = document.querySelectorAll('.sidebar-link');
+        
+        links.forEach(link => {
+            const href = link.getAttribute('href').replace(/\/$/, '');
+            if (href === currentPath || (href !== '' && currentPath.startsWith(href))) {
+                link.classList.add('active');
             }
         });
     });
 </script>
 
 <style>
-    /* Sidebars */
-    .left-sidebar {
+    .lucode-sidebar {
+        width: 18rem;
+        flex-shrink: 0;
         position: sticky;
-        top: calc(60px + 3rem); /* 헤더 높이(60px) + 컨테이너 상단 여백(3rem). 0px 유격 완벽 고정 */
-        align-self: start;
-        height: max-content;
-        max-height: calc(100vh - 60px - 3rem - 2rem); /* 뷰포트 하단 여백 확보 */
+        top: 3.5rem;
+        height: calc(100vh - 3.5rem);
         overflow-y: auto;
-        padding-right: 1rem;
-        scrollbar-width: none; /* 스크롤바 숨김 (Firefox) */
+        padding: 3rem 2rem;
+        border-right: 1px solid transparent;
+        /* starlight-like fading gradient border on the right */
+        border-image: linear-gradient(to bottom, transparent, var(--border-color) 20%, var(--border-color) 80%, transparent) 1;
+        background-color: var(--bg-color);
     }
-    .left-sidebar::-webkit-scrollbar {
-        display: none; /* 스크롤바 숨김 (Chrome/Safari) */
+
+    .lucode-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .lucode-sidebar::-webkit-scrollbar-thumb {
+        background-color: var(--border-color);
+        border-radius: 4px;
+    }
+
+    .lucode-sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
     }
 
     .group-title {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 700;
-        color: var(--text-secondary);
-        margin-bottom: 1rem;
-        letter-spacing: 1.5px;
+        color: var(--foreground);
+        opacity: 0.6;
+        margin-bottom: 0.5rem;
+        letter-spacing: 1px;
+        padding-left: 0.5rem; /* Aligns with category text */
     }
 
-    .menu-group {
-        margin-bottom: 2.5rem;
-    }
-
-    .menu-item {
-        display: block;
-        padding: 0.5rem 0.8rem;
-        margin-left: -0.8rem;
-        border-radius: 6px;
-        color: var(--text-secondary);
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-    }
-
-    .menu-item:hover {
-        background: var(--hover-bg);
-        color: var(--text-primary);
-    }
-
-    .menu-item.active {
-        color: var(--text-primary);
-        font-weight: 700;
-        background: var(--hover-bg);
-    }
-
-    /* Accordion Category Styles */
+    /* Accordion Styles */
     .category-folder {
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.5rem;
     }
-    
-    .folder-title {
+
+    .sidebar-group-title {
+        font-size: 0.8rem; /* Decreased font size */
+        font-weight: 600;
+        color: var(--foreground);
+        padding: 0.25rem 0.5rem;
         cursor: pointer;
         user-select: none;
-        list-style: none; /* Hide default arrow */
+        list-style: none;
         display: flex;
         align-items: center;
-        /* 패딩을 일반 메뉴와 똑같이 맞춰서 왼쪽 정렬 유지 */
-        padding-left: 0.8rem !important; 
+        transition: color 0.15s;
     }
     
-    .folder-title::-webkit-details-marker {
-        display: none;
-    }
-    
-    .folder-title::before {
-        content: '>';
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.8rem;
-        display: inline-block;
-        margin-right: 0.5rem; /* 아이콘과 텍스트 사이 간격 */
-        transition: transform 0.2s ease-in-out;
-        transform-origin: center;
-        color: var(--text-secondary);
-    }
-    
-    /* 열렸을 때 > 모양이 아래를 향하도록 90도 회전 */
-    details[open] .folder-title::before {
-        transform: rotate(90deg);
-    }
-    
-    .folder-content {
-        padding-left: 1.5rem; /* 원래대로 복구 */
-        margin-top: 0.2rem;
-        border-left: 1px solid var(--border-color);
-        margin-left: 0.4rem;
-        margin-bottom: 0.8rem;
-    }
-    
-    .sub-item {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
+    .sidebar-group-title:hover {
+        color: var(--signature-color);
     }
 
-    @media (max-width: 768px) {
-        .left-sidebar {
+    .sidebar-group-title::-webkit-details-marker {
+        display: none;
+    }
+
+    .sidebar-group-title::before {
+        content: '>';
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        display: inline-block;
+        margin-right: 0.5rem;
+        transition: transform 0.2s ease-in-out;
+        transform-origin: center;
+        color: var(--muted-foreground);
+    }
+
+    details[open] .sidebar-group-title::before {
+        transform: rotate(90deg);
+    }
+
+    .folder-content {
+        margin-top: 0.25rem;
+    }
+
+    .sidebar-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        padding-left: 1rem; /* Indentation for items */
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+
+    .sidebar-list.no-indent {
+        padding-left: 0;
+    }
+
+    .sidebar-link {
+        display: block;
+        padding: 0.375rem 0.5rem;
+        font-size: 0.8rem; /* Decreased font size */
+        text-decoration: none;
+        color: var(--muted-foreground);
+        border-radius: 0.375rem;
+        transition: color 0.15s, background-color 0.15s;
+        line-height: 1.25rem;
+    }
+
+    .sidebar-link:hover {
+        color: var(--foreground);
+        background-color: var(--muted);
+    }
+
+    .sidebar-link.active {
+        color: var(--signature-color);
+        background-color: var(--muted);
+        font-weight: 600;
+    }
+
+    .top-level {
+        font-weight: 500;
+    }
+
+    @media (max-width: 1024px) {
+        .lucode-sidebar {
             display: none; 
         }
-        .left-sidebar.mobile-open {
+        .lucode-sidebar.mobile-open {
             display: block;
             position: fixed;
-            top: 60px; /* Header height */
+            top: 3.5rem;
             left: 0;
-            width: 260px;
-            height: calc(100vh - 60px);
-            max-height: none;
+            width: 100%;
+            height: calc(100vh - 3.5rem);
             background: var(--bg-color);
-            border-right: 1px solid var(--border-color);
             z-index: 999;
             padding: 2rem 1.5rem;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            border-image: none;
+            border-right: none;
         }
     }
 </style>

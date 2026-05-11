@@ -5,36 +5,29 @@ import PostList from '../components/PostList.astro';
 const { frontmatter, headings } = Astro.props;
 
 // 같은 카테고리의 포스트들을 불러오기
-const allPosts = await Astro.glob('../pages/blog/**/*.md');
+const allPosts = await Astro.glob('../pages/**/*.md');
 const currentPath = Astro.url.pathname;
 
 const categoryPosts = allPosts.filter(post => {
-    // 인덱스 및 카테고리 대문 파일 제외
     if (post.file.endsWith('_blog-index.md') || post.frontmatter.isCategory) return false;
-    
-    // 현재 보고 있는 글은 리스트에서 제외
     if (currentPath === post.url || currentPath === post.url + '/') return false;
-
-    // 현재 글과 카테고리가 같은 글만 필터링
     return post.frontmatter.category && frontmatter.category && 
            post.frontmatter.category === frontmatter.category;
 })
 .sort((a, b) => new Date(b.frontmatter.date || 0).valueOf() - new Date(a.frontmatter.date || 0).valueOf());
 ---
 <BlogLayout title={`${frontmatter.title} | Studio.lib`} description={frontmatter.description} headings={headings}>
-    <article class="markdown-body">
+    <article class="sl-markdown-content">
         <header class="post-header">
-            <h1 class="post-title">{frontmatter.title}</h1>
+            <h1 id="_top">{frontmatter.title}</h1>
             <div class="post-meta">
-                <span class="date">{frontmatter.date}</span>
+                <span>{frontmatter.date}</span>
                 {frontmatter.tags && frontmatter.tags.map((tag: string) => (
                     <span class="tag">#{tag}</span>
                 ))}
             </div>
             {frontmatter.heroImage && (
-                <div class="hero-image-container">
-                    <img src={frontmatter.heroImage} alt={frontmatter.title} class="hero-image" />
-                </div>
+                <img src={frontmatter.heroImage} alt={frontmatter.title} class="hero-image" />
             )}
         </header>
         
@@ -42,10 +35,8 @@ const categoryPosts = allPosts.filter(post => {
             <slot />
         </div>
 
-        {/* 지스커스 (Giscus) 댓글창 */}
         <div class="comments-section">
-            <h3 class="section-subtitle">Comments</h3>
-            <p class="giscus-notice">※ <code>src/layouts/BlogPostLayout.astro</code> 하단에서 Giscus 저장소 정보를 본인 Github에 맞게 수정해주세요.</p>
+            <h2 id="comments">Comments</h2>
             <script src="https://giscus.app/client.js"
                 data-repo="[ENTER REPO HERE]"
                 data-repo-id="[ENTER REPO ID HERE]"
@@ -63,10 +54,9 @@ const categoryPosts = allPosts.filter(post => {
             </script>
         </div>
 
-        {/* 카테고리 내 다른 글 목록 */}
         {categoryPosts.length > 0 && (
             <div class="category-posts-section">
-                <h3 class="section-subtitle">More from this category</h3>
+                <h2 id="more-posts">More Posts</h2>
                 <PostList posts={categoryPosts} />
             </div>
         )}
@@ -74,142 +64,149 @@ const categoryPosts = allPosts.filter(post => {
 </BlogLayout>
 
 <style is:global>
-    .markdown-body {
-        max-width: 800px;
-        margin: 0 auto;
+    .sl-markdown-content * {
+        @media (min-width: 40rem) {
+            font-size: 14px; /* 0.875rem */
+            line-height: 1.8;
+        }
     }
+
+    .sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
+        font-weight: 500;
+        letter-spacing: var(--tracking-tight);
+        color: var(--foreground);
+    }
+
+    .sl-markdown-content h1 {
+        font-size: 1.75rem;
+        line-height: 2.25rem;
+        font-weight: 600;
+    }
+
+    .sl-markdown-content h2 {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        padding-top: 1.5rem;
+        margin-top: 4rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .sl-markdown-content h3 {
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        margin-top: 2.5rem;
+    }
+
+    .sl-markdown-content h4 {
+        font-size: 1rem;
+        line-height: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .sl-markdown-content p {
+        margin-bottom: 1.5rem;
+        color: var(--foreground);
+    }
+
+    .sl-markdown-content a:not([class]) {
+        text-decoration: underline;
+        text-underline-offset: 0.25rem;
+        text-decoration-color: var(--signature-color);
+        color: var(--signature-color);
+        font-weight: 500;
+        transition: color 0.15s, text-decoration-color 0.15s;
+    }
+
+    .sl-markdown-content a:not([class]):hover {
+        color: var(--foreground);
+        text-decoration-color: var(--foreground);
+    }
+
+    .sl-markdown-content blockquote {
+        border-left: 4px solid var(--signature-color);
+        padding: 0.5rem 1rem;
+        color: var(--muted-foreground);
+        background: var(--muted);
+        margin: 1.5rem 0;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        font-style: italic;
+    }
+
+    .sl-markdown-content ul, .sl-markdown-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+    }
+
+    .sl-markdown-content li {
+        margin-bottom: 0.5rem;
+    }
+
+    .sl-markdown-content :not(pre) > code {
+        background: var(--muted);
+        border: 1px solid var(--border-color);
+        border-radius: calc(var(--radius) - 4px);
+        padding: 0.25rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.875em;
+        color: var(--signature-color);
+    }
+
+    .sl-markdown-content pre {
+        background-color: #0a0a0a !important; /* Force dark code blocks */
+        color: #fafafa;
+        padding: 1.5rem;
+        border-radius: var(--radius);
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        border: 1px solid var(--border-color);
+    }
+
+    .sl-markdown-content pre code {
+        background: transparent;
+        padding: 0;
+        border: none;
+        color: inherit;
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+    }
+
+    .sl-markdown-content img {
+        max-width: 100%;
+        border-radius: var(--radius);
+        margin: 1.5rem 0;
+        border: 1px solid var(--border-color);
+    }
+</style>
+
+<style>
     .post-header {
         margin-bottom: 3rem;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 2rem;
     }
-    .post-title {
-        font-size: 1.8rem;
-        font-weight: 800;
-        margin: 0 0 1rem 0;
-        line-height: 1.2;
-        letter-spacing: -0.5px;
-    }
+
     .post-meta {
         display: flex;
         gap: 1rem;
         align-items: center;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.85rem;
-        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        color: var(--muted-foreground);
+        margin-top: 1rem;
     }
     .post-meta .tag {
-        background: transparent;
-        border: 1px solid var(--signature-color);
-        color: var(--signature-color);
-        padding: 0.2rem 0.6rem;
-        border-radius: 4px;
+        color: var(--foreground);
     }
 
-    .hero-image-container {
-        margin-top: 2rem;
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid var(--border-color);
-    }
     .hero-image {
         width: 100%;
         height: auto;
         display: block;
         max-height: 400px;
         object-fit: cover;
-    }
-
-    /* Markdown Content Styling */
-    .post-content {
-        line-height: 1.7;
-        font-size: 1.05rem;
-        color: var(--text-primary);
-    }
-    .post-content h1, .post-content h2, .post-content h3, .post-content h4, .post-content h5, .post-content h6 {
-        scroll-margin-top: 100px; /* 헤더 60px + 여백 40px */
-    }
-    .post-content h2 {
-        font-size: 1.8rem;
-        margin-top: 2.5rem;
-        margin-bottom: 1rem;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-    }
-    .post-content h3 {
-        font-size: 1.4rem;
         margin-top: 2rem;
-        margin-bottom: 0.8rem;
-        font-weight: 700;
-    }
-    .post-content p {
-        margin-bottom: 1.5rem;
-    }
-    .post-content a {
-        color: var(--signature-color);
-        text-decoration: underline;
-        text-underline-offset: 4px;
-    }
-    .post-content ul, .post-content ol {
-        margin-bottom: 1.5rem;
-        padding-left: 1.5rem;
-    }
-    .post-content li {
-        margin-bottom: 0.5rem;
-    }
-    .post-content blockquote {
-        border-left: 4px solid var(--signature-color);
-        padding-left: 1rem;
-        color: var(--text-secondary);
-        font-style: italic;
-        margin: 1.5rem 0;
-    }
-    .post-content code {
-        font-family: 'JetBrains Mono', monospace;
-        background: var(--hover-bg, rgba(0,0,0,0.05));
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        font-size: 0.9em;
-    }
-    .post-content pre {
-        background: #1e1e1e;
-        color: #d4d4d4;
-        padding: 1.5rem;
-        border-radius: 8px;
-        overflow-x: auto;
-        margin: 1.5rem 0;
-    }
-    .post-content pre code {
-        background: transparent;
-        padding: 0;
-        color: inherit;
-    }
-    .post-content img {
-        max-width: 100%;
-        border-radius: 8px;
-        margin: 1.5rem 0;
-        border: 1px solid var(--border-color);
     }
 
-    /* Category Posts & Comments Section */
     .category-posts-section, .comments-section {
-        margin-top: 5rem;
-        padding-top: 2rem;
-        border-top: 1px dashed var(--border-color);
-    }
-    .section-subtitle {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-bottom: 2rem;
-        color: var(--text-primary);
-    }
-    .giscus-notice {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        background: var(--hover-bg);
-        padding: 0.8rem;
-        border-radius: 6px;
-        margin-bottom: 2rem;
+        margin-top: 2rem;
+        padding-top: 1rem;
     }
 </style>
