@@ -273,8 +273,8 @@ const { posts } = Astro.props;
     .post-link {
         text-decoration: none;
         color: var(--foreground);
-        display: inline-block; /* Allows the link to fit tightly around the text */
-        width: max-content;
+        display: block; /* Changed from inline-block to block */
+        width: 100%; /* Changed from max-content to 100% to prevent overflow */
     }
     .post-title {
         font-size: 1.25rem;
