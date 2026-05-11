@@ -1,0 +1,201 @@
+---
+// src/components/LogWidget.astro
+import logs from '../../public/data/daily-logs.json';
+const latestLog = logs[0];
+---
+
+<div id="log-widget" class="log-widget-container">
+    <button id="log-toggle" class="log-toggle-btn" aria-label="Toggle Log">
+        <span class="status-dot"></span>
+        <span class="toggle-text">DAILY_LOG</span>
+        <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
+    
+    <div id="log-content-panel" class="log-panel">
+        <div class="log-panel-header">
+            <span class="panel-title">SYSTEM_STATUS_LOG</span>
+            <a href="/daily" class="view-all-link">VIEW_ALL</a>
+        </div>
+        <div class="log-panel-body">
+            <div class="log-entry">
+                <span class="log-date">[{latestLog.date}]</span>
+                <p class="log-text">{latestLog.content}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script is:inline>
+    const initLogWidget = () => {
+        const widget = document.getElementById('log-widget');
+        const toggleBtn = document.getElementById('log-toggle');
+        
+        if (!widget || !toggleBtn) return;
+
+        // Load state
+        const isExpanded = localStorage.getItem('log-widget-expanded') === 'true';
+        if (isExpanded) {
+            widget.classList.add('expanded');
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            const nowExpanded = widget.classList.toggle('expanded');
+            localStorage.setItem('log-widget-expanded', nowExpanded);
+        });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLogWidget);
+    } else {
+        initLogWidget();
+    }
+</script>
+
+<style>
+    .log-widget-container {
+        position: fixed;
+        bottom: 1.25rem;
+        right: 1.25rem;
+        z-index: 2000;
+        font-family: 'JetBrains Mono', monospace;
+        display: flex;
+        flex-direction: column-reverse; /* Button at bottom, panel above */
+        align-items: flex-end;
+        gap: 0.5rem;
+    }
+
+    /* Toggle Button */
+    .log-toggle-btn {
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        padding: 0.5rem 0.9rem;
+        border-radius: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: var(--foreground);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .log-toggle-btn:hover {
+        border-color: var(--signature-color);
+        transform: translateY(-2px);
+    }
+
+    .toggle-text {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        background-color: var(--signature-color);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(1.1); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    .chevron-icon {
+        transition: transform 0.3s ease;
+        opacity: 0.6;
+    }
+
+    .expanded .chevron-icon {
+        transform: rotate(0deg); /* Facing up normally, rotate to face down when expanded? Actually it depends on the icon. Let's make it intuitive. */
+    }
+    
+    .chevron-icon {
+        transform: rotate(0deg); /* Default pointing up */
+    }
+    .expanded .chevron-icon {
+        transform: rotate(180deg); /* Pointing down when panel is visible above */
+    }
+
+    /* Panel */
+    .log-panel {
+        width: 280px;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: bottom right;
+    }
+
+    .expanded .log-panel {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+    }
+
+    .log-panel-header {
+        background: var(--muted);
+        padding: 0.75rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .panel-title {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--muted-foreground);
+    }
+
+    .view-all-link {
+        font-size: 0.65rem;
+        color: var(--signature-color);
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .view-all-link:hover {
+        text-decoration: underline;
+    }
+
+    .log-panel-body {
+        padding: 1.25rem;
+    }
+
+    .log-entry {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .log-date {
+        font-size: 0.7rem;
+        color: var(--muted-foreground);
+    }
+
+    .log-text {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin: 0;
+        color: var(--foreground);
+    }
+
+    @media (max-width: 480px) {
+        .log-widget-container {
+            bottom: 1rem;
+            right: 1rem;
+        }
+        .log-panel {
+            width: calc(100vw - 2rem);
+        }
+    }
+</style>

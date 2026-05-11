@@ -10,8 +10,7 @@
         <div class="nav-right">
             <nav class="main-nav">
                 <a href="/" class="nav-item">Blog</a>
-                <a href="/archive" class="nav-item">Archive</a>
-                <a href="/contact" class="nav-item">Contact</a>
+                <a href="/about" class="nav-item">About</a>
             </nav>
             
             <button id="search-btn" class="search-btn" aria-label="Search">
@@ -60,10 +59,19 @@
         // Active Menu Highlight
         const currentPath = window.location.pathname;
         const navItems = document.querySelectorAll('.nav-item');
+        
         navItems.forEach(item => {
+            const href = item.getAttribute('href');
             item.classList.remove('active');
-            if (currentPath.startsWith(item.getAttribute('href'))) {
-                item.classList.add('active');
+            
+            if (href === '/about') {
+                if (currentPath.startsWith('/about')) {
+                    item.classList.add('active');
+                }
+            } else if (href === '/') {
+                if (!currentPath.startsWith('/about')) {
+                    item.classList.add('active');
+                }
             }
         });
 

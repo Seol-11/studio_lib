@@ -5,7 +5,8 @@ export const categories = [
         title: 'Daily Log (일상)',
         items: [
             { title: '일기장', path: '/log/diary' },
-            { title: '음악', path: '/log/music' }
+            { title: '음악', path: '/log/music' },
+            { title: '독서', path: '/log/reading' }
         ]
     },
     {
@@ -17,6 +18,13 @@ export const categories = [
             { title: 'RTL Design', path: '/study/rtl' }
         ]
     },
-    { type: 'link', title: 'Environment (환경세팅)', path: '/env' },
-    { type: 'link', title: 'Projects (기획)', path: '/projects' }
+    {
+        type: 'folder',
+        id: 'project',
+        title: 'Projects (기획)',
+        items: [
+            { title: 'OFDM', path: '/projects/OFDM' }
+        ]
+    },
+    { type: 'link', title: 'Environment (환경세팅)', path: '/env' }
 ];

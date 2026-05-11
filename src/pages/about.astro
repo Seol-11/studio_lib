@@ -1,0 +1,44 @@
+---
+import BlogLayout from '../layouts/BlogLayout.astro';
+---
+
+<BlogLayout title="About | Studio.lib">
+    <div class="sl-markdown-content">
+        <header class="category-header">
+            <h1 class="category-title" id="_top">About</h1>
+            <p class="category-meta">System Router & Digital Logic Portfolio</p>
+        </header>
+
+        <div class="about-content">
+            <p>Welcome to Studio.lib. This is a place where I document my journey through hardware architectures and digital logic design.</p>
+            
+            <h2 id="background">Background</h2>
+            <p>I am passionate about building efficient systems and understanding the low-level details of how hardware works.</p>
+
+            <h2 id="contact">Contact</h2>
+            <p>Feel free to reach out to me through my social channels or email.</p>
+        </div>
+    </div>
+</BlogLayout>
+
+<style>
+    .category-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+    }
+    .category-title {
+        font-size: 1.875rem !important;
+        font-weight: 600 !important;
+        margin: 0 0 0.5rem 0 !important;
+        letter-spacing: var(--tracking-tight) !important;
+    }
+    .category-meta {
+        color: var(--muted-foreground);
+        font-size: 0.9375rem;
+        margin: 0 !important;
+    }
+
+    .about-content {
+        margin-bottom: 1rem;
+    }
+</style>

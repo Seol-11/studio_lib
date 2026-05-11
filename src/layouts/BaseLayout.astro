@@ -1,5 +1,6 @@
 ---
 // src/layouts/BaseLayout.astro
+import LogWidget from '../components/LogWidget.astro';
 
 export interface Props {
     title?: string;
@@ -37,6 +38,7 @@ const {
     </head>
     <body>
     <slot />
+    <LogWidget />
     </body>
     </html>
 

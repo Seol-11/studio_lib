@@ -1,0 +1,251 @@
+---
+import BlogLayout from '../layouts/BlogLayout.astro';
+import logs from '../../public/data/daily-logs.json';
+---
+
+<BlogLayout title="Daily Log | Studio.lib">
+    <div class="sl-markdown-content">
+        <header class="category-header">
+            <h1 class="category-title" id="_top">Daily Log</h1>
+            <p class="category-meta">하루 한 줄, 시스템 로그처럼 남기는 짧은 생각들</p>
+        </header>
+
+        <div class="log-timeline" id="log-timeline-container">
+            {logs.map((log) => (
+                <details class="log-item" data-date={log.date}>
+                    <summary class="log-summary">
+                        <div class="log-marker">
+                            <div class="log-dot"></div>
+                            <div class="log-line"></div>
+                        </div>
+                        <div class="log-header">
+                            <span class="log-date">{log.date}</span>
+                            <span class="log-preview">{log.content}</span>
+                        </div>
+                    </summary>
+                    <div class="log-body">
+                        <div class="log-content-inner">
+                            {/* Detailed content removed as per previous step */}
+                        </div>
+                    </div>
+                </details>
+            ))}
+        </div>
+
+        <div id="log-pagination" class="pagination"></div>
+    </div>
+</BlogLayout>
+
+<script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ITEMS_PER_PAGE = 20;
+        const logItems = Array.from(document.querySelectorAll('.log-item'));
+        const paginationContainer = document.getElementById('log-pagination');
+        let currentPage = 1;
+
+        if (!logItems.length) return;
+
+        function render() {
+            const totalPages = Math.ceil(logItems.length / ITEMS_PER_PAGE);
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+
+            logItems.forEach((item, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            html += `<button class="page-btn nav-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button>`;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+            }
+
+            html += `<button class="page-btn nav-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>&gt;</button>`;
+            
+            paginationContainer.innerHTML = html;
+
+            paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (btn.hasAttribute('disabled')) return;
+                    currentPage = parseInt(btn.dataset.page);
+                    render();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        }
+
+        render();
+    });
+</script>
+
+<style>
+    .category-header {
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+    }
+    .category-title {
+        font-size: 1.875rem !important;
+        font-weight: 600 !important;
+        margin: 0 0 0.5rem 0 !important;
+        letter-spacing: var(--tracking-tight) !important;
+    }
+    .category-meta {
+        color: var(--muted-foreground);
+        font-size: 0.9375rem;
+        margin: 0 !important;
+    }
+
+    .log-timeline {
+        display: flex;
+        flex-direction: column;
+        padding-left: 0.5rem;
+        min-height: 400px;
+    }
+
+    .log-item {
+        display: none; /* Controlled by JS */
+        margin-bottom: 0;
+    }
+
+    .log-summary {
+        display: flex;
+        gap: 1.5rem;
+        cursor: pointer;
+        list-style: none;
+        outline: none;
+    }
+
+    .log-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .log-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding-top: 0.25rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .log-item:last-child .log-line {
+        display: none;
+    }
+
+    .log-marker {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    .log-dot {
+        width: 10px;
+        height: 10px;
+        background-color: var(--signature-color);
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .log-line {
+        width: 2px;
+        flex: 1;
+        background-color: var(--border-color);
+        margin: 4px 0;
+        min-height: 40px;
+    }
+
+    .log-date {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem;
+        color: var(--muted-foreground);
+    }
+
+    .log-preview {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--foreground);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        width: 100%;
+    }
+
+    .log-item[open] .log-preview {
+        white-space: normal;
+        overflow: visible;
+        word-break: break-all;
+    }
+
+    .log-body {
+        padding-bottom: 2rem;
+        border-left: 2px solid var(--border-color);
+        margin-left: 4px; 
+        padding-left: 31px;
+        margin-top: -5px;
+    }
+    
+    .log-item:last-child .log-body {
+        border-left: 2px solid transparent;
+    }
+
+    .log-content-inner {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--muted-foreground);
+        padding-top: 0.5rem;
+    }
+
+    /* Pagination Styles */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.25rem;
+        margin-top: 3rem;
+        padding-bottom: 2rem;
+    }
+
+    :global(.page-btn) {
+        background: transparent;
+        border: none;
+        color: var(--muted-foreground);
+        cursor: pointer;
+        font-family: var(--font-mono);
+        font-size: 0.875rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--radius);
+        transition: all 0.15s;
+    }
+
+    :global(.page-btn:hover:not([disabled])) {
+        color: var(--foreground);
+        background-color: var(--muted);
+    }
+
+    :global(.page-btn.active) {
+        color: var(--signature-color);
+        background-color: var(--muted);
+        font-weight: 700;
+    }
+
+    :global(.page-btn[disabled]) {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+</style>
