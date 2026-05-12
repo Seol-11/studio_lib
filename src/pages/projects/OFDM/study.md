@@ -1,6 +1,6 @@
 ---
 layout: ~/layouts/BlogPostLayout.astro
-title: "6G Next-Generation Communication: OFDM System Design on FPGA"
+title: "6G OFDM System Design on FPGA"
 date: "2026-05-11"
 description: "6G 통신을 위한 고속 OFDM 송수신기 하드웨어 아키텍처 및 FPGA 구현 전략"
 tags: ["projects", "6G", "OFDM", "FPGA", "Verilog"]

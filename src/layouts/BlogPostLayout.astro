@@ -81,6 +81,8 @@ const categoryPosts = allPosts.filter(post => {
         font-size: 1.75rem;
         line-height: 2.25rem;
         font-weight: 600;
+        word-break: keep-all;
+        overflow-wrap: break-word;
     }
 
     .sl-markdown-content h2 {
@@ -109,11 +111,16 @@ const categoryPosts = allPosts.filter(post => {
     }
 
     @media (max-width: 600px) {
-        .sl-markdown-content h1 { font-size: 1.5rem; line-height: 2rem; }
-        .sl-markdown-content h2 { font-size: 1.2rem; line-height: 1.6rem; margin-top: 3rem; }
+        .sl-markdown-content h1 { font-size: 1.4rem; line-height: 1.8rem; }
+        .sl-markdown-content h2 { font-size: 1.15rem; line-height: 1.6rem; margin-top: 2.5rem; }
         .sl-markdown-content h3 { font-size: 1.05rem; line-height: 1.5rem; margin-top: 2rem; }
         .sl-markdown-content h4 { font-size: 0.95rem; }
-        .sl-markdown-content p { font-size: 0.95rem; line-height: 1.6; }
+        .sl-markdown-content p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem; }
+        
+        /* 모바일 디테일 최적화 */
+        .post-header { margin-bottom: 2rem; }
+        .post-meta { font-size: 0.8rem; gap: 0.4rem 0.8rem; margin-top: 0.75rem; }
+        .hero-image { margin-top: 1.5rem; }
     }
 
     .sl-markdown-content a:not([class]) {
@@ -193,12 +200,16 @@ const categoryPosts = allPosts.filter(post => {
 
     .post-meta {
         display: flex;
-        gap: 1rem;
+        gap: 0.5rem 1rem;
+        flex-wrap: wrap;
         align-items: center;
         font-family: var(--font-mono);
         font-size: 0.875rem;
         color: var(--muted-foreground);
         margin-top: 1rem;
+    }
+    .post-meta span:first-child {
+        white-space: nowrap;
     }
     .post-meta .tag {
         color: var(--foreground);
