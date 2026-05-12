@@ -108,6 +108,14 @@ const categoryPosts = allPosts.filter(post => {
         color: var(--foreground);
     }
 
+    @media (max-width: 600px) {
+        .sl-markdown-content h1 { font-size: 1.5rem; line-height: 2rem; }
+        .sl-markdown-content h2 { font-size: 1.2rem; line-height: 1.6rem; margin-top: 3rem; }
+        .sl-markdown-content h3 { font-size: 1.05rem; line-height: 1.5rem; margin-top: 2rem; }
+        .sl-markdown-content h4 { font-size: 0.95rem; }
+        .sl-markdown-content p { font-size: 0.95rem; line-height: 1.6; }
+    }
+
     .sl-markdown-content a:not([class]) {
         text-decoration: underline;
         text-underline-offset: 0.25rem;
@@ -206,7 +214,7 @@ const categoryPosts = allPosts.filter(post => {
     }
 
     .category-posts-section, .comments-section {
-        margin-top: 2rem;
-        padding-top: 1rem;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
     }
 </style>

@@ -6,6 +6,50 @@ import { categories } from '../pages/_categories';
 
 <aside class="lucode-sidebar">
     <nav class="lucode-sidebar-nav">
+        <!-- Personal Space: Lo-fi / Anime Vibes -->
+        <div class="personal-space">
+            <div class="group-title">PERSONAL_SPACE</div>
+            
+            <!-- Anime Profile Box -->
+            <div class="nature-box">
+                <div class="nature-image" style="background-image: url('https://i.pinimg.com/736x/08/ab/dd/08abdd53ebc85b0ac832de1bc4958f20.jpg');"></div>
+                <div class="nature-overlay">
+                    <span class="location-tag">NEO_TOKYO // CORE</span>
+                    <span class="status-tag">STATUS: ONLINE</span>
+                </div>
+            </div>
+
+            <!-- Interactive Compact Music Widget -->
+            <div class="playlist-widget interactive-compact" id="music-widget">
+                <div class="now-playing-header">
+                    <div class="music-bars">
+                        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    </div>
+                    <div class="track-display">
+                        <div class="track-scroll-wrapper">
+                            <div class="track-content">
+                                <span class="track-title">Heavy Serenade</span>
+                                <span class="track-separator">-</span>
+                                <span class="track-artist">NMIXX</span>
+                            </div>
+                            <div class="track-content" aria-hidden="true">
+                                <span class="track-title">Heavy Serenade</span>
+                                <span class="track-separator">-</span>
+                                <span class="track-artist">NMIXX</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="anim-toggle" id="music-anim-toggle" title="Toggle Animation">
+                        <div class="toggle-dot"></div>
+                    </button>
+                </div>
+                <!-- Playback Bar -->
+                <div class="playback-bar">
+                    <div class="playback-progress"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="group-title">CATEGORIES</div>
         <!-- Categories -->
         {categories.map(category => {
@@ -70,6 +114,20 @@ import { categories } from '../pages/_categories';
                 link.classList.add('active');
             }
         });
+
+        // Music Widget Animation Toggle
+        const musicWidget = document.getElementById('music-widget');
+        const animToggle = document.getElementById('music-anim-toggle');
+        
+        if (musicWidget && animToggle) {
+            const isPaused = localStorage.getItem('music-anim-paused') === 'true';
+            if (isPaused) musicWidget.classList.add('paused');
+
+            animToggle.addEventListener('click', () => {
+                const nowPaused = musicWidget.classList.toggle('paused');
+                localStorage.setItem('music-anim-paused', nowPaused);
+            });
+        }
     });
 </script>
 
@@ -81,25 +139,203 @@ import { categories } from '../pages/_categories';
         top: 3.5rem;
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
+        overscroll-behavior: contain;
         padding: 3rem 2rem;
         border-right: 1px solid transparent;
         /* starlight-like fading gradient border on the right */
         border-image: linear-gradient(to bottom, transparent, var(--border-color) 20%, var(--border-color) 80%, transparent) 1;
         background-color: var(--bg-color);
+        /* Firefox */
+        scrollbar-width: none;
+        /* IE and Edge */
+        -ms-overflow-style: none;
     }
 
+    /* Chrome, Safari and Opera */
     .lucode-sidebar::-webkit-scrollbar {
-        width: 6px;
-    }
-    .lucode-sidebar::-webkit-scrollbar-thumb {
-        background-color: var(--border-color);
-        border-radius: 4px;
+        display: none;
     }
 
     .lucode-sidebar-nav {
         display: flex;
         flex-direction: column;
         gap: 1rem;
+    }
+
+    /* Personal Space Styling */
+    .personal-space {
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .nature-box {
+        position: relative;
+        width: 100%;
+        height: 110px;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    .nature-image {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        filter: saturate(0.8) contrast(0.9);
+        transition: transform 0.6s ease;
+    }
+    .nature-box:hover .nature-image {
+        transform: scale(1.1);
+    }
+    .nature-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), transparent 60%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 0.75rem;
+        color: white;
+        font-family: var(--font-mono);
+        pointer-events: none;
+    }
+    .location-tag { font-size: 0.55rem; opacity: 0.7; letter-spacing: 0.5px; }
+    .status-tag { font-size: 0.65rem; font-weight: 700; color: var(--signature-color); margin-top: 2px; }
+
+    /* Interactive Compact Music Widget */
+    .playlist-widget {
+        background: var(--muted);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 0.6rem 0.85rem;
+        font-family: var(--font-mono);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .now-playing-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .music-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 10px;
+        flex-shrink: 0;
+    }
+    .bar {
+        width: 2px;
+        background: var(--signature-color);
+        animation: music-flow 0.8s ease-in-out infinite alternate;
+    }
+    .bar:nth-child(2) { animation-delay: 0.2s; }
+    .bar:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes music-flow {
+        from { height: 2px; }
+        to { height: 10px; }
+    }
+
+    .track-display {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .track-scroll-wrapper {
+        display: flex;
+        width: max-content;
+        font-size: 0.7rem;
+        color: var(--foreground);
+        animation: scroll-text 15s linear infinite;
+    }
+
+    .track-content {
+        display: flex;
+        align-items: center;
+        padding-right: 2.5rem; /* 반복되는 텍스트 사이의 여백 */
+    }
+
+    /* Animation Control */
+    .playlist-widget.paused .playback-progress {
+        animation-play-state: paused !important;
+    }
+
+    .playlist-widget.paused .bar,
+    .playlist-widget.paused .track-scroll-wrapper {
+        animation: none !important;
+    }
+
+    .playlist-widget.paused .bar {
+        height: 2px !important;
+    }
+
+    .anim-toggle {
+        background: none;
+        border: none;
+        padding: 5px;
+        cursor: pointer;
+        opacity: 0.3;
+        transition: opacity 0.2s, transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 4px;
+    }
+    .anim-toggle:hover { opacity: 1; transform: scale(1.2); }
+    .toggle-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--signature-color);
+        box-shadow: 0 0 5px var(--signature-color);
+    }
+    .playlist-widget.paused .toggle-dot {
+        background: var(--muted-foreground);
+        box-shadow: none;
+    }
+
+    @keyframes scroll-text {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+
+    .track-artist {
+        font-weight: 500;
+        opacity: 0.7;
+    }
+    .track-separator {
+        opacity: 0.5;
+        margin: 0 4px;
+    }
+    .track-title {
+        font-weight: 800;
+        opacity: 0.9;
+    }
+
+    /* Playback Bar */
+    .playback-bar {
+        height: 2px;
+        background: var(--border-color);
+        border-radius: 1px;
+        margin-top: 0.7rem;
+        width: 100%;
+        overflow: hidden;
+    }
+    .playback-progress {
+        height: 100%;
+        background: var(--signature-color);
+        width: 35%;
+        border-radius: 1px;
+        animation: progress-flow 180s linear infinite;
+    }
+    @keyframes progress-flow {
+        0% { width: 0%; }
+        100% { width: 100%; }
     }
 
     .group-title {

@@ -329,6 +329,18 @@ const { posts } = Astro.props;
             width: 100px;
             height: 80px;
         }
+        .post-title {
+            font-size: 1.1rem;
+            line-height: 1.35;
+        }
+        .post-excerpt {
+            font-size: 0.85rem;
+            -webkit-line-clamp: 2;
+        }
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+        }
     }
 
     :global(.pagination) {
