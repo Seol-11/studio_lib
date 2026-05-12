@@ -62,6 +62,7 @@ const latestLog = logs[0];
         flex-direction: column-reverse; /* Button at bottom, panel above */
         align-items: flex-end;
         gap: 0.5rem;
+        pointer-events: none; /* Allow clicks to pass through the invisible container */
     }
 
     /* Toggle Button */
@@ -77,6 +78,7 @@ const latestLog = logs[0];
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         color: var(--foreground);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: auto; /* Re-enable clicks for the button */
     }
 
     .log-toggle-btn:hover {
