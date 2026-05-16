@@ -6,5 +6,13 @@ export default defineConfig({
   compressHTML: true,
   build: {
     inlineStylesheets: 'always'
+  },
+  markdown: {
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark'
+      }
+    }
   }
 });

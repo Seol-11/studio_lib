@@ -21,7 +21,8 @@ const {
     <title>{title}</title>
 
     <script is:inline>
-        const applyTheme = () => {
+        const setupMarkdown = () => {
+            // Theme setup
             const theme = (() => {
                 if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
                     return localStorage.getItem('theme');
@@ -30,10 +31,20 @@ const {
             })();
             if (theme === 'dark') document.documentElement.classList.add('dark');
             else document.documentElement.classList.remove('dark');
+
+            // Table responsive wrapper
+            const tables = document.querySelectorAll('.sl-markdown-content table');
+            tables.forEach(table => {
+                if (table.parentElement.classList.contains('table-wrapper')) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-wrapper';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
         };
 
-        applyTheme();
-        document.addEventListener('astro:after-swap', applyTheme);
+        setupMarkdown();
+        document.addEventListener('astro:after-swap', setupMarkdown);
     </script>
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -185,22 +196,103 @@ const {
         line-height: 1.75;
     }
 
-    .sl-markdown-content pre {
-        background-color: #0a0a0a !important;
-        color: #fafafa;
-        padding: 1.5rem;
-        border-radius: var(--radius);
-        margin: 1.5rem 0;
+    /* Table Styles - Optimized */
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        margin: 2rem 0;
         border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+
+    .sl-markdown-content table {
+        width: 100%;
+        border-collapse: collapse;
         font-size: 0.875rem;
+        min-width: 500px;
+    }
+
+    .sl-markdown-content th,
+    .sl-markdown-content td {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .sl-markdown-content th {
+        background-color: var(--muted);
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .sl-markdown-content tr:nth-child(even) {
+        background-color: rgba(128, 128, 128, 0.04);
+    }
+
+    /* Code Styles - Neutral Gray & Dual Theme Support */
+    .sl-markdown-content pre {
+        padding: 1.25rem;
+        border-radius: 10px;
+        margin: 1.75rem 0;
+        font-size: 0.9rem;
         line-height: 1.6;
+        overflow-x: auto;
+        font-family: var(--font-mono);
+        border: 1px solid var(--border-color);
+    }
+
+    /* Light Mode (Default) */
+    html:not(.dark) .sl-markdown-content pre {
+        background-color: #f0f0f0 !important;
+        border-color: #e0e0e0;
+        color: #24292e !important;
+    }
+
+    /* Dark Mode Overrides */
+    html.dark .sl-markdown-content pre {
+        background-color: #262626 !important;
+        border-color: #333333;
+        color: #c9d1d9 !important;
+    }
+
+    /* Switch to dark theme variables for tokens in dark mode */
+    html.dark .sl-markdown-content pre code span {
+        color: var(--shiki-dark) !important;
+        font-style: var(--shiki-dark-font-style, inherit) !important;
+        font-weight: var(--shiki-dark-font-weight, inherit) !important;
+        text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
+    }
+
+    .sl-markdown-content code:not(pre code) {
+        background-color: var(--muted);
+        padding: 0.15rem 0.35rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-family: var(--font-mono);
+        color: var(--signature-color);
+        border: 1px solid var(--border-color);
+    }
+
+    .sl-markdown-content pre::-webkit-scrollbar { height: 8px; }
+    .sl-markdown-content pre::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
     }
 
     .sl-markdown-content img {
         max-width: 100%;
         border-radius: var(--radius);
-        margin: 1.5rem 0;
+        margin: 2rem 0 1rem 0;
         border: 1px solid var(--border-color);
+    }
+
+    /* Image Caption */
+    .sl-markdown-content img + em {
+        display: block;
+        text-align: center;
+        font-size: 0.875rem;
+        color: var(--muted-foreground);
+        margin-bottom: 2rem;
+        font-style: normal;
     }
 
     /* Common Category/Listing Header Styles */
