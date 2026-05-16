@@ -1,0 +1,60 @@
+---
+// src/components/GiscusComments.astro
+---
+
+<div class="giscus-wrapper">
+    <div class="giscus"></div>
+</div>
+
+<script is:inline>
+    function getGiscusTheme() {
+        return document.documentElement.classList.contains('dark') ? 'gruvbox_dark' : 'preferred_color_scheme';
+    }
+
+    function loadGiscus() {
+        const script = document.createElement('script');
+        script.src = 'https://giscus.app/client.js';
+        script.setAttribute('data-repo', 'Seol-11/studio_lib');
+        script.setAttribute('data-repo-id', 'R_kgDORkMBPg');
+        script.setAttribute('data-category', 'Announcements');
+        script.setAttribute('data-category-id', 'DIC_kwDORkMBPs4C9LmA');
+        script.setAttribute('data-mapping', 'pathname');
+        script.setAttribute('data-strict', '0');
+        script.setAttribute('data-reactions-enabled', '1');
+        script.setAttribute('data-emit-metadata', '0');
+        script.setAttribute('data-input-position', 'bottom');
+        script.setAttribute('data-theme', getGiscusTheme());
+        script.setAttribute('data-lang', 'ko');
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        const container = document.querySelector('.giscus');
+        if (container) {
+            container.innerHTML = '';
+            container.appendChild(script);
+        }
+    }
+
+    // 테마 변경 감지 로직 (한 번만 등록)
+    if (!window.giscusObserver) {
+        window.giscusObserver = new MutationObserver(() => {
+            const iframe = document.querySelector('iframe.giscus-frame');
+            if (!iframe) return;
+            iframe.contentWindow.postMessage(
+                { giscus: { setConfig: { theme: getGiscusTheme() } } },
+                'https://giscus.app'
+            );
+        });
+        window.giscusObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // 초기 로드 및 페이지 전환 시 실행
+    document.addEventListener('astro:page-load', loadGiscus);
+</script>
+
+<style>
+    .giscus-wrapper {
+        width: 100%;
+        margin-top: 1rem;
+    }
+</style>

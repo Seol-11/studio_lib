@@ -1,6 +1,7 @@
 ---
 import BlogLayout from '../layouts/BlogLayout.astro';
 import logs from '../../public/data/daily-logs.json';
+import GiscusComments from '../components/GiscusComments.astro';
 ---
 
 <BlogLayout title="Daily Log | Studio.lib">
@@ -33,12 +34,17 @@ import logs from '../../public/data/daily-logs.json';
         </div>
 
         <div id="log-pagination" class="pagination"></div>
+
+        <div class="category-posts-section comments-section">
+            <h2 id="guestbook" class="guestbook-heading">Guestbook</h2>
+            <GiscusComments />
+        </div>
     </div>
 </BlogLayout>
 
 <script is:inline>
     const initDailyLog = () => {
-        const ITEMS_PER_PAGE = 20;
+        const ITEMS_PER_PAGE = 10;
         const logItems = Array.from(document.querySelectorAll('.log-item'));
         const paginationContainer = document.getElementById('log-pagination');
         let currentPage = 1;
@@ -100,7 +106,7 @@ import logs from '../../public/data/daily-logs.json';
         padding-bottom: 0.5rem;
     }
     .category-title {
-        font-size: 1.875rem !important;
+        font-size: 1.75rem !important;
         font-weight: 600 !important;
         margin: 0 0 0.5rem 0 !important;
         letter-spacing: var(--tracking-tight) !important;
@@ -112,7 +118,6 @@ import logs from '../../public/data/daily-logs.json';
     }
 
     .log-timeline {
-...
         display: flex;
         flex-direction: column;
         padding-left: 0.5rem;
@@ -221,7 +226,7 @@ import logs from '../../public/data/daily-logs.json';
         justify-content: center;
         gap: 0.25rem;
         margin-top: 3rem;
-        padding-bottom: 2rem;
+        padding-bottom: 0; /* 여백 제거 */
     }
 
     :global(.page-btn) {
@@ -250,5 +255,23 @@ import logs from '../../public/data/daily-logs.json';
     :global(.page-btn[disabled]) {
         opacity: 0.3;
         cursor: not-allowed;
+    }
+
+    .comments-section {
+        margin-top: 0; /* 페이지네이션과 밀착 */
+        padding-top: 0;
+        border-top: none;
+    }
+
+    .guestbook-heading {
+        /* blog post의 h2(Related Posts)와 동일한 양식으로 설정 */
+        font-size: 1.25rem !important; 
+        font-weight: 500 !important;
+        margin-top: 2rem !important; /* 여백을 조금 더 줄임 */
+        padding-top: 1rem !important;
+        padding-bottom: 0.5rem !important;
+        margin-bottom: 1rem !important;
+        letter-spacing: var(--tracking-tight) !important;
+        color: var(--foreground);
     }
 </style>

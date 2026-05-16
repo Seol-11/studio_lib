@@ -1,6 +1,7 @@
 ---
 import BlogLayout from './BlogLayout.astro';
 import PostList from '../components/PostList.astro';
+import GiscusComments from '../components/GiscusComments.astro';
 
 const { frontmatter, headings } = Astro.props;
 
@@ -37,21 +38,7 @@ const categoryPosts = allPosts.filter(post => {
 
         <div class="comments-section">
             <h2 id="comments">Comments</h2>
-            <script is:inline src="https://giscus.app/client.js"
-                data-repo="[ENTER REPO HERE]"
-                data-repo-id="[ENTER REPO ID HERE]"
-                data-category="[ENTER CATEGORY HERE]"
-                data-category-id="[ENTER CATEGORY ID HERE]"
-                data-mapping="pathname"
-                data-strict="0"
-                data-reactions-enabled="1"
-                data-emit-metadata="0"
-                data-input-position="bottom"
-                data-theme="preferred_color_scheme"
-                data-lang="ko"
-                crossorigin="anonymous"
-                async>
-            </script>
+            <GiscusComments />
         </div>
 
         {categoryPosts.length > 0 && (
@@ -99,7 +86,6 @@ const categoryPosts = allPosts.filter(post => {
         padding-top: 1rem;
         padding-bottom: 0.5rem;
     }
-
 
     .sl-markdown-content h3 {
         font-size: 1.125rem;
