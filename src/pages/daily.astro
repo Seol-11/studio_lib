@@ -37,7 +37,7 @@ import logs from '../../public/data/daily-logs.json';
 </BlogLayout>
 
 <script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
+    const initDailyLog = () => {
         const ITEMS_PER_PAGE = 20;
         const logItems = Array.from(document.querySelectorAll('.log-item'));
         const paginationContainer = document.getElementById('log-pagination');
@@ -62,6 +62,7 @@ import logs from '../../public/data/daily-logs.json';
         }
 
         function renderPagination(totalPages) {
+            if (!paginationContainer) return;
             if (totalPages <= 1) {
                 paginationContainer.innerHTML = '';
                 return;
@@ -79,7 +80,7 @@ import logs from '../../public/data/daily-logs.json';
             paginationContainer.innerHTML = html;
 
             paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', () => {
                     if (btn.hasAttribute('disabled')) return;
                     currentPage = parseInt(btn.dataset.page);
                     render();
@@ -89,7 +90,9 @@ import logs from '../../public/data/daily-logs.json';
         }
 
         render();
-    });
+    };
+
+    document.addEventListener('astro:page-load', initDailyLog);
 </script>
 
 <style>
@@ -171,7 +174,7 @@ import logs from '../../public/data/daily-logs.json';
     }
 
     .log-date {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         color: var(--muted-foreground);
     }

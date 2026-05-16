@@ -50,18 +50,21 @@
         // Theme Toggle
         const toggleBtn = document.getElementById("theme-toggle-header");
         if (toggleBtn) {
-            toggleBtn.addEventListener("click", () => {
+            const newBtn = toggleBtn.cloneNode(true);
+            toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
+            
+            newBtn.addEventListener("click", () => {
                 const isNowDark = document.documentElement.classList.toggle("dark");
                 localStorage.setItem("theme", isNowDark ? "dark" : "light");
             });
         }
         
         // Active Menu Highlight
-        const currentPath = window.location.pathname;
+        const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
         const navItems = document.querySelectorAll('.nav-item');
         
         navItems.forEach(item => {
-            const href = item.getAttribute('href');
+            const href = item.getAttribute('href').replace(/\/$/, '') || '/';
             item.classList.remove('active');
             
             if (href === '/about') {
@@ -69,7 +72,11 @@
                     item.classList.add('active');
                 }
             } else if (href === '/') {
-                if (!currentPath.startsWith('/about')) {
+                if (currentPath === '/' || (!currentPath.startsWith('/about') && !currentPath.startsWith('/log') && !currentPath.startsWith('/study') && !currentPath.startsWith('/projects'))) {
+                    item.classList.add('active');
+                }
+            } else {
+                if (currentPath.startsWith(href)) {
                     item.classList.add('active');
                 }
             }
@@ -78,7 +85,10 @@
         // Mobile Menu Logic
         const mobileBtn = document.getElementById('mobile-menu-btn');
         if (mobileBtn) {
-            mobileBtn.addEventListener('click', () => {
+            const newMobileBtn = mobileBtn.cloneNode(true);
+            mobileBtn.parentNode.replaceChild(newMobileBtn, mobileBtn);
+
+            newMobileBtn.addEventListener('click', () => {
                 const leftSidebar = document.querySelector('.lucode-sidebar') || document.querySelector('.left-sidebar');
                 if (leftSidebar) {
                     leftSidebar.classList.toggle('mobile-open');
@@ -121,54 +131,70 @@
         };
 
         if (searchBtn) {
-            searchBtn.addEventListener('click', openSearch);
-            closeSearchBtn?.addEventListener('click', closeSearch);
-            backdrop?.addEventListener('click', closeSearch);
+            const newSearchBtn = searchBtn.cloneNode(true);
+            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+            newSearchBtn.addEventListener('click', openSearch);
 
-            window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && searchModal?.classList.contains('active')) {
+            if (closeSearchBtn) {
+                const newCloseBtn = closeSearchBtn.cloneNode(true);
+                closeSearchBtn.parentNode.replaceChild(newCloseBtn, closeSearchBtn);
+                newCloseBtn.addEventListener('click', closeSearch);
+            }
+
+            if (backdrop) {
+                const newBackdrop = backdrop.cloneNode(true);
+                backdrop.parentNode.replaceChild(newBackdrop, backdrop);
+                newBackdrop.addEventListener('click', closeSearch);
+            }
+
+            const handleKeydown = (e) => {
+                if (e.key === 'Escape' && document.getElementById('search-modal')?.classList.contains('active')) {
                     closeSearch();
                 }
                 if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                     e.preventDefault();
                     openSearch();
                 }
-            });
+            };
+            window.removeEventListener('keydown', handleKeydown);
+            window.addEventListener('keydown', handleKeydown);
 
-            searchInput?.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase();
-                if (!query) {
-                    searchResults.innerHTML = '<div class="search-empty">Type to start searching...</div>';
-                    return;
-                }
-                if (!searchData) return;
+            if (searchInput) {
+                const newSearchInput = searchInput.cloneNode(true);
+                searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+                
+                newSearchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    const resultsContainer = document.getElementById('search-results');
+                    if (!query) {
+                        resultsContainer.innerHTML = '<div class="search-empty">Type to start searching...</div>';
+                        return;
+                    }
+                    if (!searchData) return;
 
-                const results = searchData.filter(item => 
-                    item.title.toLowerCase().includes(query) || 
-                    item.description.toLowerCase().includes(query) ||
-                    (item.tags && item.tags.some(t => t.toLowerCase().includes(query)))
-                );
+                    const results = searchData.filter(item => 
+                        item.title.toLowerCase().includes(query) || 
+                        item.description.toLowerCase().includes(query) ||
+                        (item.tags && item.tags.some(t => t.toLowerCase().includes(query)))
+                    );
 
-                if (results.length === 0) {
-                    searchResults.innerHTML = '<div class="search-empty">No results found for "'+query+'"</div>';
-                    return;
-                }
+                    if (results.length === 0) {
+                        resultsContainer.innerHTML = '<div class="search-empty">No results found for "'+query+'"</div>';
+                        return;
+                    }
 
-                searchResults.innerHTML = results.map(item => `
-                    <a href="${item.url}" class="search-result-item">
-                        <div class="search-result-title">${item.title}</div>
-                        <div class="search-result-desc">${item.description}</div>
-                    </a>
-                `).join('');
-            });
+                    resultsContainer.innerHTML = results.map(item => `
+                        <a href="${item.url}" class="search-result-item">
+                            <div class="search-result-title">${item.title}</div>
+                            <div class="search-result-desc">${item.description}</div>
+                        </a>
+                    `).join('');
+                });
+            }
         }
     };
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initHeader);
-    } else {
-        initHeader();
-    }
+    document.addEventListener('astro:page-load', initHeader);
 </script>
 
 <style>
@@ -204,7 +230,7 @@
     }
 
     .brand {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         font-weight: 800;
         font-size: 1.2rem;
         color: var(--foreground);
@@ -235,7 +261,7 @@
     }
 
     .nav-item {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         color: var(--muted-foreground);
         text-decoration: none;
@@ -324,7 +350,7 @@
         font-size: 1.1rem;
         color: var(--foreground);
         outline: none;
-        font-family: 'Inter', sans-serif;
+        font-family: var(--font-sans);
     }
     .close-search-btn {
         background: var(--muted);
@@ -334,7 +360,7 @@
         padding: 0.2rem 0.5rem;
         border-radius: 4px;
         cursor: pointer;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
     }
     .search-results {
         max-height: 400px;

@@ -49,10 +49,12 @@ const {
     </div>
 
     <script is:inline>
-        document.addEventListener('DOMContentLoaded', () => {
+        const initTOC = () => {
             const tocLinks = document.querySelectorAll('.toc-link');
-            const headings = Array.from(document.querySelectorAll('h1[id], h2[id], h3[id], h4[id]'));
+            const contentHeadings = Array.from(document.querySelectorAll('.sl-markdown-content h1[id], .sl-markdown-content h2[id], .sl-markdown-content h3[id], .sl-markdown-content h4[id]'));
             
+            if (tocLinks.length === 0) return;
+
             // Smooth Scroll
             tocLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -88,8 +90,10 @@ const {
                 });
             }, observerOptions);
 
-            headings.forEach(h => observer.observe(h));
-        });
+            contentHeadings.forEach(h => observer.observe(h));
+        };
+
+        document.addEventListener('astro:page-load', initTOC);
     </script>
 </BaseLayout>
 
@@ -137,7 +141,7 @@ const {
     }
 
     .group-title {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         font-size: 0.7rem;
         font-weight: 700;
         color: var(--foreground);

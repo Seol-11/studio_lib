@@ -52,7 +52,7 @@ const { posts } = Astro.props;
 </div>
 
 <script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
+    const initPostList = () => {
         const ITEMS_PER_PAGE = 5; 
         const searchInput = document.getElementById('post-search');
         const postItems = Array.from(document.querySelectorAll('.post-item'));
@@ -117,9 +117,9 @@ const { posts } = Astro.props;
             paginationContainer.innerHTML = html;
 
             paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', () => {
                     if (btn.hasAttribute('disabled')) return;
-                    currentPage = parseInt(e.target.dataset.page);
+                    currentPage = parseInt(btn.dataset.page);
                     render();
                     
                     const listWrapper = document.querySelector('.lucode-post-list-wrapper');
@@ -134,27 +134,34 @@ const { posts } = Astro.props;
         if (searchInput) {
             const params = new URLSearchParams(window.location.search);
             const q = params.get('q');
-            if (q) {
+            if (q && !searchInput.value) {
                 searchInput.value = q;
             }
             
-            searchInput.addEventListener('input', () => { 
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+            
+            newSearchInput.addEventListener('input', () => { 
                 currentPage = 1; 
                 render(); 
             });
         }
 
         document.querySelectorAll('.tag-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+
+            newBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                const tag = btn.getAttribute('data-tag');
+                const tag = newBtn.getAttribute('data-tag');
                 
                 if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-                    if (searchInput) {
-                        searchInput.value = tag;
-                        searchInput.dispatchEvent(new Event('input'));
+                    const activeSearchInput = document.getElementById('post-search');
+                    if (activeSearchInput) {
+                        activeSearchInput.value = tag;
+                        activeSearchInput.dispatchEvent(new Event('input'));
                         window.history.pushState({}, '', `/?q=${tag}`);
                         
                         const listWrapper = document.querySelector('.lucode-post-list-wrapper');
@@ -170,7 +177,9 @@ const { posts } = Astro.props;
         });
 
         render();
-    });
+    };
+
+    document.addEventListener('astro:page-load', initPostList);
 </script>
 
 <style>

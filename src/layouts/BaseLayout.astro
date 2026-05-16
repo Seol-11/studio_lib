@@ -1,5 +1,6 @@
 ---
 // src/layouts/BaseLayout.astro
+import { ClientRouter } from 'astro:transitions';
 import LogWidget from '../components/LogWidget.astro';
 
 export interface Props {
@@ -20,14 +21,19 @@ const {
     <title>{title}</title>
 
     <script is:inline>
-        const theme = (() => {
-            if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-                return localStorage.getItem('theme');
-            }
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        })();
-        if (theme === 'dark') document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
+        const applyTheme = () => {
+            const theme = (() => {
+                if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+                    return localStorage.getItem('theme');
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            })();
+            if (theme === 'dark') document.documentElement.classList.add('dark');
+            else document.documentElement.classList.remove('dark');
+        };
+
+        applyTheme();
+        document.addEventListener('astro:after-swap', applyTheme);
     </script>
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -35,6 +41,9 @@ const {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    
+    <ClientRouter />
     </head>
     <body>
     <slot />
@@ -90,6 +99,7 @@ const {
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
         -webkit-tap-highlight-color: transparent;
+        -webkit-text-size-adjust: 100%;
     }
 
     html {

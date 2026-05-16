@@ -5,7 +5,7 @@ import PostList from '../components/PostList.astro';
 const { frontmatter } = Astro.props;
 
 // 모든 블로그 포스트 가져오기
-const allPosts = await Astro.glob('../pages/**/*.md');
+const allPosts = Object.values(import.meta.glob('../pages/**/*.md', { eager: true })) as any[];
 
 // 메인 화면용, 카테고리용 md 파일 제외, 그리고 이 카테고리에 맞는 포스트만 필터링
 const posts = allPosts.filter(post => {

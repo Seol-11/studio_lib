@@ -4,7 +4,7 @@ import logs from '../../public/data/daily-logs.json';
 const latestLog = logs[0];
 ---
 
-<div id="log-widget" class="log-widget-container">
+<div id="log-widget" class="log-widget-container" transition:persist="log-widget">
     <button id="log-toggle" class="log-toggle-btn" aria-label="Toggle Log">
         <span class="status-dot"></span>
         <span class="toggle-text">DAILY_LOG</span>
@@ -38,17 +38,16 @@ const latestLog = logs[0];
             widget.classList.add('expanded');
         }
 
-        toggleBtn.addEventListener('click', () => {
+        const newToggleBtn = toggleBtn.cloneNode(true);
+        toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+
+        newToggleBtn.addEventListener('click', () => {
             const nowExpanded = widget.classList.toggle('expanded');
             localStorage.setItem('log-widget-expanded', nowExpanded);
         });
     };
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initLogWidget);
-    } else {
-        initLogWidget();
-    }
+    document.addEventListener('astro:page-load', initLogWidget);
 </script>
 
 <style>
@@ -57,7 +56,7 @@ const latestLog = logs[0];
         bottom: 1.25rem;
         right: 1.25rem;
         z-index: 2000;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         display: flex;
         flex-direction: column-reverse; /* Button at bottom, panel above */
         align-items: flex-end;
@@ -109,13 +108,6 @@ const latestLog = logs[0];
     .chevron-icon {
         transition: transform 0.3s ease;
         opacity: 0.6;
-    }
-
-    .expanded .chevron-icon {
-        transform: rotate(0deg); /* Facing up normally, rotate to face down when expanded? Actually it depends on the icon. Let's make it intuitive. */
-    }
-    
-    .chevron-icon {
         transform: rotate(0deg); /* Default pointing up */
     }
     .expanded .chevron-icon {

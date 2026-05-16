@@ -12,7 +12,7 @@ import { categories } from '../pages/_categories';
             
             <!-- Anime Profile Box -->
             <div class="nature-box">
-                <div class="nature-image" style="background-image: url('https://i.pinimg.com/736x/08/ab/dd/08abdd53ebc85b0ac832de1bc4958f20.jpg');"></div>
+                <div class="nature-image" style="background-image: url('https://i.pinimg.com/1200x/98/90/4e/98904e5111b35f7cecaeefe80ba51837.jpg');"></div>
                 <div class="nature-overlay">
                     <span class="location-tag">NEO_TOKYO // CORE</span>
                     <span class="status-tag">STATUS: ONLINE</span>
@@ -28,14 +28,14 @@ import { categories } from '../pages/_categories';
                     <div class="track-display">
                         <div class="track-scroll-wrapper">
                             <div class="track-content">
-                                <span class="track-title">Heavy Serenade</span>
+                                <span class="track-title">검은산</span>
                                 <span class="track-separator">-</span>
-                                <span class="track-artist">NMIXX</span>
+                                <span class="track-artist">wave to earth</span>
                             </div>
                             <div class="track-content" aria-hidden="true">
-                                <span class="track-title">Heavy Serenade</span>
+                                <span class="track-title">검은산</span>
                                 <span class="track-separator">-</span>
-                                <span class="track-artist">NMIXX</span>
+                                <span class="track-artist">wave to earth</span>
                             </div>
                         </div>
                     </div>
@@ -59,7 +59,7 @@ import { categories } from '../pages/_categories';
                         <summary class="sidebar-group-title">{category.title}</summary>
                         <div class="folder-content">
                             <ul class="sidebar-list">
-                                {category.items.map(item => (
+                                {category.items && category.items.map(item => (
                                     <li>
                                         <a href={item.path} class="sidebar-link">{item.title}</a>
                                     </li>
@@ -84,8 +84,7 @@ import { categories } from '../pages/_categories';
 </aside>
 
 <script is:inline>
-    // FOUC 방지 및 폴더 상태 유지
-    (function() {
+    const initSidebar = () => {
         const folders = document.querySelectorAll('.category-folder');
         folders.forEach(folder => {
             const id = folder.getAttribute('data-folder-id');
@@ -98,19 +97,24 @@ import { categories } from '../pages/_categories';
                 folder.setAttribute('open', ''); // 기본값은 열림
             }
 
-            folder.addEventListener('toggle', () => {
-                localStorage.setItem(`folder-state-${id}`, folder.hasAttribute('open') ? 'open' : 'closed');
+            const summary = folder.querySelector('summary');
+            const newSummary = summary.cloneNode(true);
+            summary.parentNode.replaceChild(newSummary, summary);
+
+            newSummary.addEventListener('click', () => {
+                setTimeout(() => {
+                    localStorage.setItem(`folder-state-${id}`, folder.hasAttribute('open') ? 'open' : 'closed');
+                }, 50);
             });
         });
-    })();
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const currentPath = window.location.pathname.replace(/\/$/, '');
+        const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
         const links = document.querySelectorAll('.sidebar-link');
         
         links.forEach(link => {
-            const href = link.getAttribute('href').replace(/\/$/, '');
-            if (href === currentPath || (href !== '' && currentPath.startsWith(href))) {
+            const href = link.getAttribute('href').replace(/\/$/, '') || '/';
+            link.classList.remove('active');
+            if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
                 link.classList.add('active');
             }
         });
@@ -123,12 +127,17 @@ import { categories } from '../pages/_categories';
             const isPaused = localStorage.getItem('music-anim-paused') === 'true';
             if (isPaused) musicWidget.classList.add('paused');
 
-            animToggle.addEventListener('click', () => {
+            const newToggle = animToggle.cloneNode(true);
+            animToggle.parentNode.replaceChild(newToggle, animToggle);
+
+            newToggle.addEventListener('click', () => {
                 const nowPaused = musicWidget.classList.toggle('paused');
                 localStorage.setItem('music-anim-paused', nowPaused);
             });
         }
-    });
+    };
+
+    document.addEventListener('astro:page-load', initSidebar);
 </script>
 
 <style>
@@ -210,7 +219,7 @@ import { categories } from '../pages/_categories';
         border: 1px solid var(--border-color);
         border-radius: 10px;
         padding: 0.6rem 0.85rem;
-        font-family: var(--font-mono);
+        font-family: 'Pretendard', var(--font-mono); /* High-quality Korean font specifically for the widget */
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         overflow: hidden;
     }
@@ -339,7 +348,7 @@ import { categories } from '../pages/_categories';
     }
 
     .group-title {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         font-size: 0.7rem;
         font-weight: 700;
         color: var(--foreground);
@@ -377,7 +386,7 @@ import { categories } from '../pages/_categories';
 
     .sidebar-group-title::before {
         content: '>';
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-mono);
         font-size: 0.7rem;
         display: inline-block;
         margin-right: 0.5rem;
