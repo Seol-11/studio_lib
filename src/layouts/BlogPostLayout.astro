@@ -64,74 +64,60 @@ const categoryPosts = allPosts.filter(post => {
 </BlogLayout>
 
 <style is:global>
+    /* Content Typography Optimization */
     .sl-markdown-content {
         font-family: 'Pretendard', var(--font-sans);
-        letter-spacing: -0.005em; /* Extremely subtle tracking for modern clarity */
-        word-break: keep-all; /* Prevents awkward Korean line breaks */
+        letter-spacing: 0;
+        word-break: keep-all;
+        /* 본문 폰트 크기 축소 (15px ~ 16px) */
+        font-size: clamp(0.9375rem, 0.915rem + 0.1vw, 1rem);
     }
 
     .sl-markdown-content strong,
     .sl-markdown-content b {
-        font-weight: 600; /* Softened from 700 for a more refined look */
-    }
-
-    .sl-markdown-content * {
-        @media (min-width: 40rem) {
-            font-size: 16px;
-            line-height: 1.75;
-        }
+        font-weight: 550;
     }
 
     .sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
-        font-weight: 500;
+        font-weight: 500; /* 다시 500으로 낮추어 깔끔하게 변경 */
         letter-spacing: var(--tracking-tight);
         color: var(--foreground);
     }
 
     .sl-markdown-content h1 {
         font-size: 1.75rem;
-        line-height: 2.25rem;
-        font-weight: 600;
-        word-break: keep-all;
-        overflow-wrap: break-word;
+        font-weight: 600; /* 인덱스 제목과 동일하게 600으로 통일 */
+        line-height: 1.3;
+        margin-bottom: 1rem;
     }
 
     .sl-markdown-content h2 {
-        font-size: 1.25rem;
-        line-height: 1.75rem;
-        padding-top: 1.25rem; /* Increased from 1rem */
-        margin-top: 3.5rem;   /* Increased from 3rem */
+        font-size: 1.25rem; /* 예전 크기로 고정 */
+        font-weight: 500;
+        line-height: 1.4;
+        margin-top: 3rem;
+        padding-top: 1rem;
         padding-bottom: 0.5rem;
     }
 
+
     .sl-markdown-content h3 {
         font-size: 1.125rem;
-        line-height: 1.75rem;
-        margin-top: 2.25rem; /* Increased from 2rem */
-    }
-
-    .sl-markdown-content h4 {
-        font-size: 1rem;
-        line-height: 1.5rem;
-        margin-top: 1.75rem; /* Increased from 1.5rem */
+        margin-top: 2.25rem;
     }
 
     .sl-markdown-content p {
+        line-height: 1.82;
         margin-bottom: 1.5rem;
         color: var(--foreground);
     }
 
     @media (max-width: 600px) {
-        .sl-markdown-content h1 { font-size: 1.4rem; line-height: 1.8rem; }
-        .sl-markdown-content h2 { font-size: 1.15rem; line-height: 1.6rem; margin-top: 2.5rem; }
-        .sl-markdown-content h3 { font-size: 1.05rem; line-height: 1.5rem; margin-top: 2rem; }
-        .sl-markdown-content h4 { font-size: 0.95rem; }
-        .sl-markdown-content p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem; }
-        
-        /* 모바일 디테일 최적화 */
-        .post-header { margin-bottom: 2rem; }
-        .post-meta { font-size: 0.8rem; gap: 0.4rem 0.8rem; margin-top: 0.75rem; }
-        .hero-image { margin-top: 1.5rem; }
+        .sl-markdown-content p {
+            line-height: 1.77;
+            margin-bottom: 1.25rem;
+        }
+        .sl-markdown-content h2 { margin-top: 2.5rem; }
     }
 
     .sl-markdown-content a:not([class]) {
@@ -141,11 +127,6 @@ const categoryPosts = allPosts.filter(post => {
         color: var(--signature-color);
         font-weight: 500;
         transition: color 0.15s, text-decoration-color 0.15s;
-    }
-
-    .sl-markdown-content a:not([class]):hover {
-        color: var(--foreground);
-        text-decoration-color: var(--foreground);
     }
 
     .sl-markdown-content blockquote {
@@ -165,35 +146,18 @@ const categoryPosts = allPosts.filter(post => {
 
     .sl-markdown-content li {
         margin-bottom: 0.5rem;
-    }
-
-    .sl-markdown-content :not(pre) > code {
-        background: var(--muted);
-        border: 1px solid var(--border-color);
-        border-radius: calc(var(--radius) - 4px);
-        padding: 0.25rem 0.5rem;
-        font-family: var(--font-mono);
-        font-size: 0.875em;
-        color: var(--signature-color);
+        line-height: 1.75;
     }
 
     .sl-markdown-content pre {
-        background-color: #0a0a0a !important; /* Force dark code blocks */
+        background-color: #0a0a0a !important;
         color: #fafafa;
         padding: 1.5rem;
         border-radius: var(--radius);
-        overflow-x: auto;
         margin: 1.5rem 0;
         border: 1px solid var(--border-color);
-    }
-
-    .sl-markdown-content pre code {
-        background: transparent;
-        padding: 0;
-        border: none;
-        color: inherit;
-        font-family: var(--font-mono);
         font-size: 0.875rem;
+        line-height: 1.6;
     }
 
     .sl-markdown-content img {
@@ -202,13 +166,9 @@ const categoryPosts = allPosts.filter(post => {
         margin: 1.5rem 0;
         border: 1px solid var(--border-color);
     }
-</style>
 
-<style>
-    .post-header {
-        margin-bottom: 3rem;
-    }
-
+    /* Layout Styles */
+    .post-header { margin-bottom: 3rem; }
     .post-meta {
         display: flex;
         gap: 0.5rem 1rem;
@@ -219,13 +179,6 @@ const categoryPosts = allPosts.filter(post => {
         color: var(--muted-foreground);
         margin-top: 1rem;
     }
-    .post-meta span:first-child {
-        white-space: nowrap;
-    }
-    .post-meta .tag {
-        color: var(--foreground);
-    }
-
     .hero-image {
         width: 100%;
         height: auto;
@@ -233,12 +186,10 @@ const categoryPosts = allPosts.filter(post => {
         max-height: 400px;
         object-fit: cover;
         margin-top: 2rem;
+        border-radius: var(--radius);
     }
-
     .category-posts-section, .comments-section {
         margin-top: 0.5rem;
         padding-top: 0.5rem;
-    }
-</style>ing-top: 0.5rem;
     }
 </style>
