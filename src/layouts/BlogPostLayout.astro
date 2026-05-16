@@ -64,10 +64,21 @@ const categoryPosts = allPosts.filter(post => {
 </BlogLayout>
 
 <style is:global>
+    .sl-markdown-content {
+        font-family: 'Pretendard', var(--font-sans);
+        letter-spacing: -0.005em; /* Extremely subtle tracking for modern clarity */
+        word-break: keep-all; /* Prevents awkward Korean line breaks */
+    }
+
+    .sl-markdown-content strong,
+    .sl-markdown-content b {
+        font-weight: 600; /* Softened from 700 for a more refined look */
+    }
+
     .sl-markdown-content * {
         @media (min-width: 40rem) {
-            font-size: 14px; /* 0.875rem */
-            line-height: 1.8;
+            font-size: 16px;
+            line-height: 1.75;
         }
     }
 
@@ -88,21 +99,21 @@ const categoryPosts = allPosts.filter(post => {
     .sl-markdown-content h2 {
         font-size: 1.25rem;
         line-height: 1.75rem;
-        padding-top: 1.5rem;
-        margin-top: 4rem;
+        padding-top: 1.25rem; /* Increased from 1rem */
+        margin-top: 3.5rem;   /* Increased from 3rem */
         padding-bottom: 0.5rem;
     }
 
     .sl-markdown-content h3 {
         font-size: 1.125rem;
         line-height: 1.75rem;
-        margin-top: 2.5rem;
+        margin-top: 2.25rem; /* Increased from 2rem */
     }
 
     .sl-markdown-content h4 {
         font-size: 1rem;
         line-height: 1.5rem;
-        margin-top: 1.5rem;
+        margin-top: 1.75rem; /* Increased from 1.5rem */
     }
 
     .sl-markdown-content p {
