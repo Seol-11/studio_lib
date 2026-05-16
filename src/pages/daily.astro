@@ -26,7 +26,7 @@ import GiscusComments from '../components/GiscusComments.astro';
                     </summary>
                     <div class="log-body">
                         <div class="log-content-inner">
-                            {/* Detailed content removed as per previous step */}
+                            {/* 내용이 있는 경우 여기에 표시 */}
                         </div>
                     </div>
                 </details>
@@ -100,23 +100,8 @@ import GiscusComments from '../components/GiscusComments.astro';
 
     document.addEventListener('astro:page-load', initDailyLog);
 </script>
-<style>
-    .category-header {
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.5rem;
-    }
-    .category-title {
-        font-size: 1.75rem !important;
-        font-weight: 600 !important;
-        margin: 0 0 0.5rem 0 !important;
-        letter-spacing: var(--tracking-tight) !important;
-    }
-    .category-meta {
-        color: var(--muted-foreground);
-        font-size: 0.9375rem;
-        margin: 0 !important;
-    }
 
+<style>
     .log-timeline {
         display: flex;
         flex-direction: column;
@@ -125,7 +110,7 @@ import GiscusComments from '../components/GiscusComments.astro';
     }
 
     .log-item {
-        display: none; /* Controlled by JS */
+        display: none; 
         margin-bottom: 0;
     }
 
@@ -220,54 +205,16 @@ import GiscusComments from '../components/GiscusComments.astro';
         padding-top: 0.5rem;
     }
 
-    /* Pagination Styles */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        gap: 0.25rem;
-        margin-top: 3rem;
-        padding-bottom: 0; /* 여백 제거 */
-    }
-
-    :global(.page-btn) {
-        background: transparent;
-        border: none;
-        color: var(--muted-foreground);
-        cursor: pointer;
-        font-family: var(--font-mono);
-        font-size: 0.875rem;
-        padding: 0.375rem 0.75rem;
-        border-radius: var(--radius);
-        transition: all 0.15s;
-    }
-
-    :global(.page-btn:hover:not([disabled])) {
-        color: var(--foreground);
-        background-color: var(--muted);
-    }
-
-    :global(.page-btn.active) {
-        color: var(--signature-color);
-        background-color: var(--muted);
-        font-weight: 700;
-    }
-
-    :global(.page-btn[disabled]) {
-        opacity: 0.3;
-        cursor: not-allowed;
-    }
-
     .comments-section {
-        margin-top: 0; /* 페이지네이션과 밀착 */
+        margin-top: 0;
         padding-top: 0;
-        border-top: none;
     }
 
     .guestbook-heading {
         /* blog post의 h2(Related Posts)와 동일한 양식으로 설정 */
         font-size: 1.25rem !important; 
         font-weight: 500 !important;
-        margin-top: 2rem !important; /* 여백을 조금 더 줄임 */
+        margin-top: 2rem !important;
         padding-top: 1rem !important;
         padding-bottom: 0.5rem !important;
         margin-bottom: 1rem !important;
