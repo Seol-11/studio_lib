@@ -4,13 +4,14 @@ export async function GET() {
   
   const searchIndex = Object.values(posts)
     .filter((post) => {
-      if (post.file && post.file.endsWith('_blog-index.md')) return false;
+      if (post.file && post.file.split('/').pop().startsWith('_')) return false;
       if (post.frontmatter && post.frontmatter.isCategory) return false;
+      if (!post.frontmatter || !post.frontmatter.title) return false;
       return true;
     })
     .map((post) => {
       return {
-        title: post.frontmatter.title || 'Untitled',
+        title: post.frontmatter.title,
         description: post.frontmatter.description || '',
         url: post.url,
         date: post.frontmatter.date || '',

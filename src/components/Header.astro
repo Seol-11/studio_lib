@@ -45,13 +45,15 @@
     </div>
 </div>
 
-<script is:inline>
+<script>
+    import Fuse from 'fuse.js';
+
     const initHeader = () => {
         // Theme Toggle
         const toggleBtn = document.getElementById("theme-toggle-header");
         if (toggleBtn) {
             const newBtn = toggleBtn.cloneNode(true);
-            toggleBtn.parentNode.replaceChild(newBtn, toggleBtn);
+            toggleBtn.parentNode?.replaceChild(newBtn, toggleBtn);
             
             newBtn.addEventListener("click", () => {
                 document.documentElement.classList.add('theme-toggling');
@@ -68,7 +70,7 @@
         const navItems = document.querySelectorAll('.nav-item');
         
         navItems.forEach(item => {
-            const href = item.getAttribute('href').replace(/\/$/, '') || '/';
+            const href = (item.getAttribute('href') || '').replace(/\/$/, '') || '/';
             item.classList.remove('active');
             
             if (href === '/about') {
@@ -90,7 +92,7 @@
         const mobileBtn = document.getElementById('mobile-menu-btn');
         if (mobileBtn) {
             const newMobileBtn = mobileBtn.cloneNode(true);
-            mobileBtn.parentNode.replaceChild(newMobileBtn, mobileBtn);
+            mobileBtn.parentNode?.replaceChild(newMobileBtn, mobileBtn);
 
             newMobileBtn.addEventListener('click', () => {
                 const leftSidebar = document.querySelector('.lucode-sidebar') || document.querySelector('.left-sidebar');
@@ -109,6 +111,7 @@
         const backdrop = document.querySelector('.search-modal-backdrop');
 
         let searchData = null;
+        let fuse = null;
 
         const openSearch = async () => {
             if (!searchModal) return;
@@ -120,6 +123,15 @@
                 try {
                     const res = await fetch('/search.json');
                     searchData = await res.json();
+                    fuse = new Fuse(searchData, {
+                        keys: [
+                            { name: 'title', weight: 0.7 },
+                            { name: 'tags', weight: 0.5 },
+                            { name: 'description', weight: 0.3 }
+                        ],
+                        threshold: 0.3,
+                        ignoreLocation: true
+                    });
                 } catch (e) {
                     console.error('Failed to load search data', e);
                 }
@@ -130,24 +142,24 @@
             if (!searchModal) return;
             searchModal.classList.remove('active');
             document.body.style.overflow = '';
-            if (searchInput) searchInput.value = '';
+            if (searchInput) (searchInput as HTMLInputElement).value = '';
             if (searchResults) searchResults.innerHTML = '<div class="search-empty">Type to start searching...</div>';
         };
 
         if (searchBtn) {
             const newSearchBtn = searchBtn.cloneNode(true);
-            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+            searchBtn.parentNode?.replaceChild(newSearchBtn, searchBtn);
             newSearchBtn.addEventListener('click', openSearch);
 
             if (closeSearchBtn) {
                 const newCloseBtn = closeSearchBtn.cloneNode(true);
-                closeSearchBtn.parentNode.replaceChild(newCloseBtn, closeSearchBtn);
+                closeSearchBtn.parentNode?.replaceChild(newCloseBtn, closeSearchBtn);
                 newCloseBtn.addEventListener('click', closeSearch);
             }
 
             if (backdrop) {
                 const newBackdrop = backdrop.cloneNode(true);
-                backdrop.parentNode.replaceChild(newBackdrop, backdrop);
+                backdrop.parentNode?.replaceChild(newBackdrop, backdrop);
                 newBackdrop.addEventListener('click', closeSearch);
             }
 
@@ -164,23 +176,22 @@
             window.addEventListener('keydown', handleKeydown);
 
             if (searchInput) {
-                const newSearchInput = searchInput.cloneNode(true);
-                searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+                const newSearchInput = searchInput.cloneNode(true) as HTMLInputElement;
+                searchInput.parentNode?.replaceChild(newSearchInput, searchInput);
                 
                 newSearchInput.addEventListener('input', (e) => {
-                    const query = e.target.value.toLowerCase();
+                    const query = (e.target as HTMLInputElement).value;
                     const resultsContainer = document.getElementById('search-results');
+                    if (!resultsContainer) return;
+
                     if (!query) {
                         resultsContainer.innerHTML = '<div class="search-empty">Type to start searching...</div>';
                         return;
                     }
-                    if (!searchData) return;
+                    if (!fuse) return;
 
-                    const results = searchData.filter(item => 
-                        item.title.toLowerCase().includes(query) || 
-                        item.description.toLowerCase().includes(query) ||
-                        (item.tags && item.tags.some(t => t.toLowerCase().includes(query)))
-                    );
+                    const fuseResults = fuse.search(query);
+                    const results = fuseResults.map(r => r.item);
 
                     if (results.length === 0) {
                         resultsContainer.innerHTML = '<div class="search-empty">No results found for "'+query+'"</div>';
