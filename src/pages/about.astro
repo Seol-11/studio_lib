@@ -1,28 +1,23 @@
 ---
 import BlogLayout from '../layouts/BlogLayout.astro';
+import { Content } from './_about.md';
 ---
 
 <BlogLayout title="About | Studio.lib">
-    <div class="sl-markdown-content">
+    <article class="sl-markdown-content">
         <header class="category-header">
             <h1 class="category-title" id="_top">About</h1>
             <p class="category-meta">System Router & Digital Logic Portfolio</p>
         </header>
 
         <div class="about-content">
-            <p>Welcome to Studio.lib. This is a place where I document my journey through hardware architectures and digital logic design.</p>
-            
-            <h2 id="background">Background</h2>
-            <p>I am passionate about building efficient systems and understanding the low-level details of how hardware works.</p>
-
-            <h2 id="contact">Contact</h2>
-            <p>Feel free to reach out to me through my social channels or email.</p>
+            <Content />
         </div>
-    </div>
+    </article>
 </BlogLayout>
 
 <style>
     .about-content {
-        margin-bottom: 0.5rem;
+        margin-top: 2rem;
     }
 </style>
