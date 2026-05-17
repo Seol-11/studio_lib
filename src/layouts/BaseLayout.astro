@@ -123,6 +123,9 @@ const {
         font-size: var(--font-size-h2);
         font-weight: 500;
         line-height: var(--leading-snug);
+        margin-top: var(--space-2xl);
+        padding-top: var(--space-md);
+        padding-bottom: var(--space-sm);
     }
 
     .sl-markdown-content h3 {
@@ -203,20 +206,19 @@ const {
     }
 
     .sl-markdown-content tr:nth-child(even) {
-        background-color: var(--table-zebra);
+        background-color: rgba(128, 128, 128, 0.04);
     }
 
     /* Code Styles - Neutral Gray & Dual Theme Support */
     .sl-markdown-content pre {
-        padding: var(--space-lg);
+        padding: 1.25rem;
         border-radius: 10px;
-        margin: var(--space-lg) 0;
-        font-size: var(--font-size-code);
+        margin: 1.75rem 0;
+        font-size: 0.9rem;
         line-height: 1.6;
         overflow-x: auto;
         font-family: var(--font-mono);
-        border: 1px solid var(--code-border);
-        background-color: var(--code-bg) !important;
+        border: 1px solid var(--border-color);
     }
 
     /* Light Mode (Default) */
