@@ -5,5 +5,3 @@ description: "소소한 일상과 생각들을 기록하는 공간입니다."
 isCategory: true
 categoryId: "log/diary"
 ---
-
-매일의 소소한 기억과 일상을 자유롭게 기록합니다.

@@ -318,22 +318,23 @@
     .search-modal-backdrop {
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.4);
+        background: var(--overlay-bg);
         backdrop-filter: blur(4px);
     }
     .search-modal-content {
         position: relative;
         width: 100%;
-        max-width: 600px;
+        max-width: var(--modal-max-width);
         background: var(--bg-color);
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        box-shadow: var(--shadow-xl);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        margin: 0 1rem;
+        margin: 0 var(--space-md);
     }
+
     .search-input-wrapper {
         display: flex;
         align-items: center;
@@ -414,4 +415,4 @@
         .nav-right { gap: 0.5rem; }
         .nav-left { margin-left: 0; }
     }
-</style>>
+</style>

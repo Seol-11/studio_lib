@@ -1,16 +1,11 @@
-**Studio.lib**은 전자의 흐름을 제어하는 로직과 이를 뒷받침하는 하드웨어 아키텍처에 대한 탐구 기록입니다. 단순히 기능을 구현하는 것을 넘어, 하드웨어 리소스를 최적화하고 시스템의 병목을 찾아 효율을 극대화하는 과정에서 희열을 느낍니다.
+전자공학 공부중입니다. ^^
 
-## CORE_FOCUS
-*   **Hardware Acceleration**: FPGA 기반 고속 신호 처리 (DSP, IFFT 등)
-*   **Communication PHY**: 6G 및 초고속 통신 시스템 PHY 아키텍처
-*   **Low-level Optimization**: 임베디드 및 RTL 수준의 성능 최적화
+<div class="contact-icons">
+    <a href="mailto:jsh120800@gmail.com" class="contact-link" aria-label="Email Me">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="contact-icon"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+    </a>
+    <a href="https://github.com/Seol-11" target="_blank" rel="noopener noreferrer" class="contact-link github-icon-only" aria-label="GitHub Profile">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="contact-icon"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+    </a>
+</div>
 
-## DESIGN_PHILOSOPHY
-> "복잡한 시스템일수록 단순하고 명확한 로직의 파이프라인이 답이다."
-
-모든 설계에는 이유가 있어야 하며, 그 이유는 타이밍 해석과 리소스 리포트에서 증명되어야 한다고 믿습니다.
-
-## TERMINAL_CONNECTION
-연결은 언제든 열려 있습니다. 기술적인 대화나 협업에 관심이 있으시다면 아래 주소로 신호를 보내주세요.
-
-📧 `jsh120800@gmail.com`

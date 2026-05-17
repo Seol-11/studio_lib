@@ -22,6 +22,12 @@
     --signature-muted: #84a98c22;   /* 시그니처 색상의 투명 버전 */
     --selection-bg: #84a98c44;      /* 텍스트 드래그 선택 영역 색상 */
 
+    /* Semantic: 코드 및 테이블 [추가] */
+    --code-bg: #f0f0f0;             /* 코드 블록 배경 */
+    --code-border: #e0e0e0;
+    --table-zebra: rgba(128, 128, 128, 0.04);
+    --overlay-bg: rgba(0, 0, 0, 0.4); /* 모달 백드롭 */
+
     /* --- 3. TYPOGRAPHY: 텍스트 상세 설정 --- */
     --tracking-tight: -0.025em;     /* 제목용 좁은 자간 */
     --tracking-normal: 0em;         /* 본문용 기본 자간 */
@@ -50,6 +56,15 @@
     --content-py: var(--space-2xl);     /* 본문 상하 여백 */
 
     /* --- 5. FONT SIZES: 글자 크기 --- */
+    --size-xs: 0.75rem;             /* 12px */
+    --size-sm: 0.875rem;            /* 14px */
+    --size-base: 1rem;              /* 16px */
+    --size-lg: 1.125rem;            /* 18px */
+    --size-xl: 1.25rem;             /* 20px */
+    --size-2xl: 1.5rem;             /* 24px */
+    --size-3xl: 1.875rem;           /* 30px */
+    --size-4xl: 2.25rem;            /* 36px */
+
     --font-size-body: clamp(0.9375rem, 0.915rem + 0.1vw, 1rem); /* [★] 반응형 본문 크기 */
     --font-size-h1: 1.75rem;        /* 대제목 크기 */
     --font-size-h2: 1.25rem;        /* 중제목 크기 */
@@ -58,9 +73,12 @@
 
     /* --- 6. LAYOUT: 구조 설계 --- */
     --header-height: 60px;          /* [★] 상단 헤더 높이 */
+    --header-offset: 3.5rem;        /* [★] 헤더 아래 컨텐츠 시작 지점 (기존 느낌 유지) */
     --content-max-width: 900px;     /* [★] 블로그 본문 최대 폭 (가독성 유지) */
     --sidebar-width: 18rem;         /* 좌/우 사이드바 너비 */
     --container-max-width: 1600px;  /* 전체 사이트 컨테이너 최대 너비 */
+    --modal-max-width: 600px;       /* 검색 모달 폭 */
+    --panel-width: 280px;           /* 로그 위젯 폭 */
     
     /* --- 7. EFFECTS: 형태 및 장식 --- */
     --radius: 0.5rem;               /* [★] 기본 모서리 둥글기 */
@@ -72,8 +90,9 @@
     /* --- 8. SYSTEM: 계층 및 투명도 --- */
     --z-header: 1000;               /* 헤더 레이어 */
     --z-modal: 2000;                /* 최상위 모달 레이어 */
-    --opacity-muted: 0.3;           /* 희미한 장식 요소 */
-    --opacity-secondary: 0.6;       /* 보조 텍스트 투명도 */
+    --opacity-muted: 0.3;           /* 희미한 장식 요소 [★] */
+    --opacity-secondary: 0.6;       /* 보조 텍스트 투명도 [★] */
+    --opacity-subtle: 0.04;         /* 아주 미세한 강조 */
     
     /* --- 9. TRANSITIONS: 애니메이션 속도 --- */
     --transition-fast: 0.15s ease;
@@ -92,4 +111,36 @@ html.dark {
     --signature-color: #a1cca5;     /* [★] 다크모드 시그니처 색상 */
     --signature-muted: #a1cca522;
     --selection-bg: #a1cca544;
+
+    /* Semantic: 코드 및 테이블 (Dark) */
+    --code-bg: #262626;
+    --code-border: #333333;
 }
+
+/* 
+   --- [!] STYLE AUDIT LOG: 프로젝트 내 잔여 고정 수치 및 위치 ---
+   아래 항목들은 개별 파일에 고정 수치(Hardcoded)로 남아있는 값들입니다.
+   추후 일괄 리팩토링이나 디자인 가이드 수정 시 참고하세요.
+
+   1. COLORS & EFFECTS
+      - 코드 블록 상세색: BaseLayout (L223-232)
+      - 테이블 줄무늬 색상: BaseLayout (L206)
+      - 사이드바 그라데이션: BlogSidebar (L204)
+      - 요소 미세 그림자들: BlogSidebar (L223, L304), Header (L331)
+
+   2. FONT SIZES
+      - 사이드바 상세정보 (0.55-0.7rem): BlogSidebar, BlogLayout
+      - 포스트 목록 상세 (0.75-0.93rem): PostList, BlogPostLayout
+      - 메뉴 및 로고 (0.85-1.2rem): Header
+      - 페이지네이션 및 코드 (0.87-0.9rem): BaseLayout
+
+   3. SPACING & SIZING
+      - 컴포넌트 고정 규격: BlogSidebar (프로필), PostList (썸네일), LogWidget (패널), Header (검색창)
+      - 본문 요소 미세 여백: BaseLayout (인용구, 리스트), PostList (태그)
+      - 타임라인 특수 구조: daily.astro (4px, 31px 등)
+
+   4. SYSTEM & BREAKPOINTS
+      - 반응형 중단점 (480-1280px): 모든 Layout 및 Component 파일의 @media 섹션
+      - 시스템 계층 (z-index): BlogSidebar (모바일 메뉴), Header/LogWidget (최상위 요소)
+      - 특수 효과: LogWidget (맥박 애니메이션), BlogSidebar (호버 스케일)
+*/

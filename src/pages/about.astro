@@ -16,8 +16,43 @@ import { Content } from './_about.md';
     </article>
 </BlogLayout>
 
-<style>
+<style is:global>
     .about-content {
-        margin-top: 2rem;
+        margin-top: var(--space-xl);
+    }
+
+    .contact-icons {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        margin-top: var(--space-md);
+        margin-left: -0.5rem; /* Aligns with text edge */
+    }
+
+    .contact-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--foreground);
+        text-decoration: none;
+        padding: var(--space-sm);
+        border-radius: var(--radius);
+        transition: all var(--transition-fast);
+        border: 1px solid transparent;
+    }
+
+    .contact-link:hover {
+        background: var(--muted);
+        color: var(--signature-color);
+        border-color: var(--border-color);
+    }
+
+    .contact-icon {
+        opacity: var(--opacity-secondary);
+        transition: opacity var(--transition-fast);
+    }
+
+    .contact-link:hover .contact-icon {
+        opacity: 1;
     }
 </style>

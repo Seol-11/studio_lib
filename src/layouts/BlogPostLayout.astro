@@ -10,7 +10,8 @@ const allPosts = Object.values(import.meta.glob('../pages/**/*.md', { eager: tru
 const currentPath = Astro.url.pathname;
 
 const categoryPosts = allPosts.filter(post => {
-    if (post.file.endsWith('_blog-index.md') || post.frontmatter.isCategory) return false;
+    const fileName = post.file.split('/').pop();
+    if (fileName.startsWith('_') || post.frontmatter.isCategory) return false;
     if (currentPath === post.url || currentPath === post.url + '/') return false;
     return post.frontmatter.category && frontmatter.category && 
            post.frontmatter.category === frontmatter.category;
