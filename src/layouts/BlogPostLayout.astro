@@ -27,9 +27,6 @@ const categoryPosts = allPosts.filter(post => {
                     <span class="tag">#{tag}</span>
                 ))}
             </div>
-            {frontmatter.heroImage && (
-                <img src={frontmatter.heroImage} alt={frontmatter.title} class="hero-image" />
-            )}
         </header>
         
         <div class="post-content">
@@ -62,15 +59,6 @@ const categoryPosts = allPosts.filter(post => {
         font-size: 0.875rem;
         color: var(--muted-foreground);
         margin-top: 1rem;
-    }
-    .hero-image {
-        width: 100%;
-        height: auto;
-        display: block;
-        max-height: 400px;
-        object-fit: cover;
-        margin-top: 2rem;
-        border-radius: var(--radius);
     }
     .category-posts-section, .comments-section {
         margin-top: 0.5rem;

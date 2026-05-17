@@ -8,8 +8,6 @@ category: "projects/OFDM"
 heroImage: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=2070"
 ---
 
-![Hardware Architecture](https://images.unsplash.com/photo-1591405351990-4726e331f141?auto=format&fit=crop&q=80&w=2070)
-
 ## 1. 개요: 6G와 OFDM 기술의 진화
 6G 통신 시스템은 5G 대비 10~100배 빠른 데이터 전송 속도와 초저지연성을 목표로 합니다. 이를 구현하기 위해 물리 계층(PHY)의 핵심인 **OFDM(Orthogonal Frequency Division Multiplexing)** 기술은 더 넓은 대역폭과 높은 부반송파(Subcarrier) 밀도를 효율적으로 처리할 수 있는 하드웨어 아키텍처가 필수적입니다.
 
@@ -27,7 +25,7 @@ heroImage: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=fo
 ### 2.1 IFFT 모듈 최적화 (Radix-4 Pipeline 방식)
 대용량 부반송파를 처리하기 위해 일반적인 Cooley-Tukey Radix-2 방식 대신, 연산 횟수를 줄이고 병렬 처리에 최적화된 **Radix-4 Feed-Forward 아키텍처**를 채택했습니다.
 
-```systemverilog
+```system-verilog
 // Radix-4 Butterfly Unit Conceptual Snippet
 module radix4_butterfly (
     input  logic clk,

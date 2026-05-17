@@ -95,6 +95,11 @@ const {
         box-sizing: border-box;
     }
 
+    /* 테마 전환 중에는 모든 애니메이션 즉시 제거 */
+    html.theme-toggling * {
+        transition: none !important;
+    }
+
     html, body {
         margin: 0;
         padding: 0;
@@ -280,7 +285,6 @@ const {
 
     .sl-markdown-content img {
         max-width: 100%;
-        border-radius: var(--radius);
         margin: 2rem 0 1rem 0;
         border: 1px solid var(--border-color);
     }
