@@ -110,8 +110,8 @@
         const searchResults = document.getElementById('search-results');
         const backdrop = document.querySelector('.search-modal-backdrop');
 
-        let searchData = null;
-        let fuse = null;
+        let searchData: any[] | null = null;
+        let fuse: Fuse<any> | null = null;
 
         const openSearch = async () => {
             if (!searchModal) return;
@@ -123,7 +123,7 @@
                 try {
                     const res = await fetch('/search.json');
                     searchData = await res.json();
-                    fuse = new Fuse(searchData, {
+                    fuse = new Fuse(searchData as any[], {
                         keys: [
                             { name: 'title', weight: 0.7 },
                             { name: 'tags', weight: 0.5 },
@@ -163,7 +163,7 @@
                 newBackdrop.addEventListener('click', closeSearch);
             }
 
-            const handleKeydown = (e) => {
+            const handleKeydown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape' && document.getElementById('search-modal')?.classList.contains('active')) {
                     closeSearch();
                 }
@@ -191,14 +191,14 @@
                     if (!fuse) return;
 
                     const fuseResults = fuse.search(query);
-                    const results = fuseResults.map(r => r.item);
+                    const results = fuseResults.map((r: any) => r.item);
 
                     if (results.length === 0) {
                         resultsContainer.innerHTML = '<div class="search-empty">No results found for "'+query+'"</div>';
                         return;
                     }
 
-                    resultsContainer.innerHTML = results.map(item => `
+                    resultsContainer.innerHTML = results.map((item: any) => `
                         <a href="${item.url}" class="search-result-item">
                             <div class="search-result-title">${item.title}</div>
                             <div class="search-result-desc">${item.description}</div>
@@ -425,5 +425,7 @@
         .header-inner { padding: 0 1rem; }
         .nav-right { gap: 0.5rem; }
         .nav-left { margin-left: 0; }
+    }
+</style> }
     }
 </style>
