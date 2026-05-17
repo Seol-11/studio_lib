@@ -208,25 +208,22 @@
         top: 0;
         left: 0;
         width: 100%;
-        background: var(--bg-color, rgba(253, 252, 248, 0.7));
+        background: var(--bg-color);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid var(--border-color, rgba(0,0,0,0.08));
+        border-bottom: 1px solid var(--border-color);
         border-top: 3px solid var(--signature-color);
         z-index: 1000;
         display: flex;
         flex-direction: column;
         align-items: center;
-        transition: background-color 0.3s ease;
-    }
-    :global(html.dark) .sys-header {
-        background: var(--bg-color, rgba(26, 26, 26, 0.7));
+        transition: background-color var(--transition-normal);
     }
 
     .header-inner {
         width: 100%;
-        max-width: 1600px;
-        height: 60px;
+        max-width: var(--container-max-width);
+        height: var(--header-height);
         padding: 0 2rem;
         display: flex;
         align-items: center;
@@ -240,7 +237,7 @@
         color: var(--foreground);
         text-decoration: none;
         letter-spacing: -0.5px;
-        transition: color 0.2s ease;
+        transition: color var(--transition-fast);
     }
     .brand:hover {
         color: var(--signature-color);
@@ -271,7 +268,7 @@
         text-decoration: none;
         text-transform: uppercase;
         letter-spacing: 1px;
-        transition: color 0.2s ease;
+        transition: color var(--transition-fast);
     }
 
     .nav-item:hover, .nav-item.active {
@@ -288,8 +285,8 @@
         align-items: center;
         justify-content: center;
         padding: 0.4rem;
-        border-radius: 4px;
-        transition: color 0.2s ease, background 0.2s ease;
+        border-radius: var(--radius);
+        transition: color var(--transition-fast), background var(--transition-fast);
     }
 
     .search-btn:hover, .theme-toggle-btn:hover, .mobile-menu-btn:hover {
@@ -309,7 +306,7 @@
     .search-modal {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        z-index: 2000;
+        z-index: var(--z-modal);
         display: none;
         align-items: flex-start;
         justify-content: center;
@@ -417,4 +414,4 @@
         .nav-right { gap: 0.5rem; }
         .nav-left { margin-left: 0; }
     }
-</style>
+</style>>

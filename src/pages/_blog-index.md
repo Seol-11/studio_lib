@@ -3,10 +3,9 @@ title: "Studio.lib // Archive"
 description: "디지털 로직, 하드웨어 아키텍처, 그리고 기술적 사색의 기록소."
 ---
 
-# SYSTEM_ROUTER.INDEX
+## SYSTEM_ROUTER.INDEX
 > "하드웨어 설계는 단순한 기능 구현을 넘어, 전자의 흐름을 정교하게 지휘하는 예술입니다."
 
-<br>
 
 ## 📡 CURRENT_STATUS
 현재 **FPGA 하드웨어 가속기** 및 **6G 통신 PHY 아키텍처**에 대한 연구가 활발히 진행 중입니다.
@@ -15,11 +14,8 @@ description: "디지털 로직, 하드웨어 아키텍처, 그리고 기술적 �
 *   **관심 기술 스택**: `Verilog` / `SystemVerilog` / `Vivado` / `FPGA`
 *   **작업 환경**: `Linux` / `Vim` / `Custom CLI Tools`
 
-<br>
-
 ---
 
-<br>
 
 ## 📂 CATEGORY_MAP
 

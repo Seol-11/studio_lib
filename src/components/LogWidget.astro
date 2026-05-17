@@ -55,7 +55,7 @@ const latestLog = logs[0];
         position: fixed;
         bottom: 1.25rem;
         right: 1.25rem;
-        z-index: 2000;
+        z-index: var(--z-modal);
         font-family: var(--font-mono);
         display: flex;
         flex-direction: column-reverse; /* Button at bottom, panel above */
@@ -69,14 +69,14 @@ const latestLog = logs[0];
         background: var(--bg-color);
         border: 1px solid var(--border-color);
         padding: 0.5rem 0.9rem;
-        border-radius: 2rem;
+        border-radius: var(--radius-full);
         display: flex;
         align-items: center;
         gap: 0.6rem;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: var(--shadow-md);
         color: var(--foreground);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
         pointer-events: auto; /* Re-enable clicks for the button */
     }
 
@@ -86,7 +86,7 @@ const latestLog = logs[0];
     }
 
     .toggle-text {
-        font-size: 0.7rem;
+        font-size: var(--size-xs);
         font-weight: 700;
         letter-spacing: 0.5px;
     }
@@ -106,7 +106,7 @@ const latestLog = logs[0];
     }
 
     .chevron-icon {
-        transition: transform 0.3s ease;
+        transition: transform var(--transition-normal) ease;
         opacity: 0.6;
         transform: rotate(0deg); /* Default pointing up */
     }
@@ -119,13 +119,13 @@ const latestLog = logs[0];
         width: 280px;
         background: var(--bg-color);
         border: 1px solid var(--border-color);
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
         overflow: hidden;
         opacity: 0;
         transform: translateY(10px) scale(0.95);
         pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-normal) cubic-bezier(0.4, 0, 0.2, 1);
         transform-origin: bottom right;
     }
 
@@ -172,13 +172,13 @@ const latestLog = logs[0];
     }
 
     .log-date {
-        font-size: 0.7rem;
+        font-size: var(--size-xs);
         color: var(--muted-foreground);
     }
 
     .log-text {
-        font-size: 0.85rem;
-        line-height: 1.5;
+        font-size: var(--font-size-meta);
+        line-height: var(--leading-normal);
         margin: 0;
         color: var(--foreground);
     }
