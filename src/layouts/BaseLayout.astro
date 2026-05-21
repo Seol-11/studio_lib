@@ -22,8 +22,7 @@ const {
     <title>{title}</title>
 
     <script is:inline>
-        const setupMarkdown = () => {
-            // Theme setup
+        const setTheme = () => {
             const theme = (() => {
                 if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
                     return localStorage.getItem('theme');
@@ -32,7 +31,12 @@ const {
             })();
             if (theme === 'dark') document.documentElement.classList.add('dark');
             else document.documentElement.classList.remove('dark');
+        };
 
+        // Run immediately on initial load
+        setTheme();
+
+        const setupMarkdown = () => {
             // Table responsive wrapper
             const tables = document.querySelectorAll('.sl-markdown-content table');
             tables.forEach(table => {
@@ -43,6 +47,9 @@ const {
                 wrapper.appendChild(table);
             });
         };
+
+        // Re-apply theme before new page is painted during navigation
+        document.addEventListener('astro:after-swap', setTheme);
 
         // Run on initial load and after each navigation
         document.addEventListener('astro:page-load', setupMarkdown);
