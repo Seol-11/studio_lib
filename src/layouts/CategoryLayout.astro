@@ -18,7 +18,26 @@ const posts = allPosts.filter(post => {
         return postCategory.includes(frontmatter.categoryId);
     }
     return postCategory === frontmatter.categoryId;
+}).map(post => {
+    let subCategory = post.frontmatter.subCategory;
+    if (!subCategory && post.url) {
+        const prefix = `/${frontmatter.categoryId}/`;
+        if (post.url.startsWith(prefix)) {
+            const remainder = post.url.substring(prefix.length);
+            const parts = remainder.split('/');
+            if (parts.length > 1) {
+                subCategory = parts[0];
+            }
+        }
+    }
+    return {
+        ...post,
+        subCategory: subCategory || null
+    };
 });
+
+// 하위 카테고리 목록 추출
+const subCategories = Array.from(new Set(posts.map(p => p.subCategory).filter(Boolean))) as string[];
 
 // 최신순 정렬
 const sortedPosts = posts.sort((a, b) => {
@@ -40,8 +59,7 @@ const sortedPosts = posts.sort((a, b) => {
         </div>
 
         <div class="category-posts-section">
-            <h2 id="related-posts">Related Posts</h2>
-            <PostList posts={sortedPosts} />
+            <PostList posts={sortedPosts} subCategories={subCategories} />
         </div>
     </div>
 </BlogLayout>
