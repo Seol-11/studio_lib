@@ -83,7 +83,7 @@ import { categories } from '../pages/_categories';
     </nav>
 </aside>
 
-<script is:inline>
+<script>
     const initSidebar = () => {
         const folders = document.querySelectorAll('.category-folder');
         folders.forEach(folder => {
@@ -147,20 +147,20 @@ import { categories } from '../pages/_categories';
         position: sticky;
         top: 3.5rem;
         height: calc(100vh - 3.5rem);
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        padding: 3rem 2rem;
         border-right: 1px solid transparent;
-        /* starlight-like fading gradient border on the right */
         border-image: linear-gradient(to bottom, transparent, var(--border-color) 20%, var(--border-color) 80%, transparent) 1;
         background-color: var(--bg-color);
-        /* Firefox */
+        
+        /* 다시 독립 스크롤을 부모로 복구, 좌우 여백만 줌 */
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding: 0 2rem;
+        
+        /* 스크롤바 숨기기 */
         scrollbar-width: none;
-        /* IE and Edge */
         -ms-overflow-style: none;
     }
 
-    /* Chrome, Safari and Opera */
     .lucode-sidebar::-webkit-scrollbar {
         display: none;
     }
@@ -169,6 +169,10 @@ import { categories } from '../pages/_categories';
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        
+        /* 기존 상하 여백을 자식 요소에 주어, 이 여백도 함께 스크롤 되도록 만듦 */
+        padding-top: 3rem;
+        padding-bottom: 5rem;
     }
 
     /* Personal Space Styling */
@@ -219,7 +223,7 @@ import { categories } from '../pages/_categories';
         border: 1px solid var(--border-color);
         border-radius: 10px;
         padding: 0.6rem 0.85rem;
-        font-family: 'Pretendard', var(--font-mono); /* High-quality Korean font specifically for the widget */
+        font-family: 'Pretendard', var(--font-mono);
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         overflow: hidden;
     }
@@ -266,7 +270,7 @@ import { categories } from '../pages/_categories';
     .track-content {
         display: flex;
         align-items: center;
-        padding-right: 2.5rem; /* 반복되는 텍스트 사이의 여백 */
+        padding-right: 2.5rem;
     }
 
     /* Animation Control */
@@ -313,18 +317,9 @@ import { categories } from '../pages/_categories';
         to { transform: translateX(-50%); }
     }
 
-    .track-artist {
-        font-weight: 500;
-        opacity: 0.7;
-    }
-    .track-separator {
-        opacity: 0.5;
-        margin: 0 4px;
-    }
-    .track-title {
-        font-weight: 800;
-        opacity: 0.9;
-    }
+    .track-artist { font-weight: 500; opacity: 0.7; }
+    .track-separator { opacity: 0.5; margin: 0 4px; }
+    .track-title { font-weight: 800; opacity: 0.9; }
 
     /* Playback Bar */
     .playback-bar {
@@ -355,7 +350,7 @@ import { categories } from '../pages/_categories';
         opacity: 0.6;
         margin-bottom: 0.5rem;
         letter-spacing: 1px;
-        padding-left: 0.5rem; /* Aligns with category text */
+        padding-left: 0.5rem;
     }
 
     /* Accordion Styles */
@@ -364,7 +359,7 @@ import { categories } from '../pages/_categories';
     }
 
     .sidebar-group-title {
-        font-size: 0.8rem; /* Decreased font size */
+        font-size: 0.8rem;
         font-weight: 600;
         color: var(--foreground);
         padding: 0.25rem 0.5rem;
@@ -376,14 +371,8 @@ import { categories } from '../pages/_categories';
         transition: color 0.15s;
     }
     
-    .sidebar-group-title:hover {
-        color: var(--signature-color);
-    }
-
-    .sidebar-group-title::-webkit-details-marker {
-        display: none;
-    }
-
+    .sidebar-group-title:hover { color: var(--signature-color); }
+    .sidebar-group-title::-webkit-details-marker { display: none; }
     .sidebar-group-title::before {
         content: '>';
         font-family: var(--font-mono);
@@ -394,53 +383,37 @@ import { categories } from '../pages/_categories';
         transform-origin: center;
         color: var(--muted-foreground);
     }
+    details[open] .sidebar-group-title::before { transform: rotate(90deg); }
 
-    details[open] .sidebar-group-title::before {
-        transform: rotate(90deg);
-    }
-
-    .folder-content {
-        margin-top: 0.25rem;
-    }
-
+    .folder-content { margin-top: 0.25rem; }
     .sidebar-list {
         list-style: none;
         padding: 0;
         margin: 0;
-        padding-left: 1rem; /* Indentation for items */
+        padding-left: 1rem;
         display: flex;
         flex-direction: column;
         gap: 0.125rem;
     }
-
-    .sidebar-list.no-indent {
-        padding-left: 0;
-    }
-
+    .sidebar-list.no-indent { padding-left: 0; }
     .sidebar-link {
         display: block;
         padding: 0.375rem 0.5rem;
-        font-size: 0.8rem; /* Decreased font size */
+        font-size: 0.8rem;
         text-decoration: none;
         color: var(--muted-foreground);
         border-radius: 0.375rem;
         transition: color 0.15s, background-color 0.15s;
         line-height: 1.25rem;
     }
-
     .sidebar-link:hover {
         color: var(--foreground);
         background-color: var(--muted);
     }
-
     .sidebar-link.active {
         color: var(--signature-color);
         background-color: var(--muted);
         font-weight: 600;
-    }
-
-    .top-level {
-        font-weight: 500;
     }
 
     @media (max-width: 1024px) {
@@ -456,9 +429,16 @@ import { categories } from '../pages/_categories';
             height: calc(100vh - 3.5rem);
             background: var(--bg-color);
             z-index: 999;
-            padding: 2rem 1.5rem;
-            border-image: none;
-            border-right: none;
+            padding: 0 1.5rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .lucode-sidebar.mobile-open::-webkit-scrollbar {
+            display: none;
+        }
+        .lucode-sidebar.mobile-open .lucode-sidebar-nav {
+            padding-top: 2rem;
+            padding-bottom: 5rem;
         }
     }
 </style>

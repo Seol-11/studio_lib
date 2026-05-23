@@ -36,6 +36,18 @@ const {
         // Run immediately on initial load
         setTheme();
 
+        // Handle View Transitions theme persistence
+        document.addEventListener('astro:before-swap', (ev) => {
+            const isDark = document.documentElement.classList.contains('dark');
+            if (isDark) {
+                ev.newDocument.documentElement.classList.add('dark');
+            } else {
+                ev.newDocument.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+    <script>
         const setupMarkdown = () => {
             // Table responsive wrapper
             const tables = document.querySelectorAll('.sl-markdown-content table');
@@ -47,9 +59,6 @@ const {
                 wrapper.appendChild(table);
             });
         };
-
-        // Re-apply theme before new page is painted during navigation
-        document.addEventListener('astro:after-swap', setTheme);
 
         // Run on initial load and after each navigation
         document.addEventListener('astro:page-load', setupMarkdown);
@@ -64,7 +73,7 @@ const {
     
     <ClientRouter />
     </head>
-    <body>
+    <body transition:animate="none">
     <slot />
     <LogWidget />
     </body>
