@@ -4,7 +4,7 @@ export const categories = [
         id: 'log',
         title: 'Daily Log (일상)',
         items: [
-            { title: '일기장', path: '/log/diary' },
+            { title: '에세이', path: '/log/essay' },
             { title: '음악', path: '/log/music' },
             { title: '독서', path: '/log/reading' }
         ]
@@ -14,8 +14,8 @@ export const categories = [
         id: 'study',
         title: 'Study Notes (공부)',
         items: [
-            { title: 'Architecture', path: '/study/arch' },
-            { title: 'RTL Design', path: '/study/rtl' }
+            { title: 'RTL Design', path: '/study/design' },
+            { title: '참고 자료', path: '/study/reference' }
         ]
     },
     {
