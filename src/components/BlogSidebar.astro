@@ -4,7 +4,7 @@ import { categories } from '../pages/_categories';
 // src/components/BlogSidebar.astro
 ---
 
-<aside class="lucode-sidebar">
+<aside class="lucode-sidebar" transition:persist="sidebar" transition:name="sidebar-container">
     <nav class="lucode-sidebar-nav">
         <!-- Personal Space: Lo-fi / Anime Vibes -->
         <div class="personal-space">
@@ -55,8 +55,8 @@ import { categories } from '../pages/_categories';
         {categories.map(category => {
             if (category.type === 'folder' || category.type === 'category') {
                 return (
-                    <details class="category-folder" data-folder-id={category.id || category.title}>
-                        <summary class="sidebar-group-title">{category.title}</summary>
+                    <div class="category-folder" data-folder-id={category.id || category.title}>
+                        <div class="sidebar-group-title">{category.title}</div>
                         <div class="folder-content">
                             <ul class="sidebar-list">
                                 {category.items && category.items.map(item => (
@@ -66,7 +66,7 @@ import { categories } from '../pages/_categories';
                                 ))}
                             </ul>
                         </div>
-                    </details>
+                    </div>
                 );
             } else if (category.type === 'link') {
                 return (
@@ -92,29 +92,33 @@ import { categories } from '../pages/_categories';
 
             const state = localStorage.getItem(`folder-state-${id}`);
             if (state === 'closed') {
-                folder.removeAttribute('open');
+                folder.classList.remove('is-open');
             } else {
-                folder.setAttribute('open', ''); // 기본값은 열림
+                folder.classList.add('is-open'); // 기본값은 열림
             }
 
-            const summary = folder.querySelector('summary');
-            const newSummary = summary.cloneNode(true);
-            summary.parentNode.replaceChild(newSummary, summary);
-
-            newSummary.addEventListener('click', () => {
-                setTimeout(() => {
-                    localStorage.setItem(`folder-state-${id}`, folder.hasAttribute('open') ? 'open' : 'closed');
-                }, 50);
-            });
+            const titleBtn = folder.querySelector('.sidebar-group-title');
+            if (titleBtn && !titleBtn.hasAttribute('data-listener-attached')) {
+                titleBtn.setAttribute('data-listener-attached', 'true');
+                titleBtn.addEventListener('click', () => {
+                    folder.classList.toggle('is-open');
+                    setTimeout(() => {
+                        localStorage.setItem(`folder-state-${id}`, folder.classList.contains('is-open') ? 'open' : 'closed');
+                    }, 50);
+                });
+            }
         });
 
-        const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+        const currentPath = window.location.pathname;
+        const normalizedCurrentPath = currentPath.endsWith('/') ? currentPath : currentPath + '/';
         const links = document.querySelectorAll('.sidebar-link');
         
         links.forEach(link => {
-            const href = link.getAttribute('href').replace(/\/$/, '') || '/';
+            const href = link.getAttribute('href') || '/';
+            const normalizedHref = href.endsWith('/') ? href : href + '/';
+            
             link.classList.remove('active');
-            if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
+            if (normalizedHref === normalizedCurrentPath || (normalizedHref !== '/' && normalizedCurrentPath.startsWith(normalizedHref))) {
                 link.classList.add('active');
             }
         });
@@ -127,13 +131,13 @@ import { categories } from '../pages/_categories';
             const isPaused = localStorage.getItem('music-anim-paused') === 'true';
             if (isPaused) musicWidget.classList.add('paused');
 
-            const newToggle = animToggle.cloneNode(true);
-            animToggle.parentNode.replaceChild(newToggle, animToggle);
-
-            newToggle.addEventListener('click', () => {
-                const nowPaused = musicWidget.classList.toggle('paused');
-                localStorage.setItem('music-anim-paused', nowPaused);
-            });
+            if (!animToggle.hasAttribute('data-listener-attached')) {
+                animToggle.setAttribute('data-listener-attached', 'true');
+                animToggle.addEventListener('click', () => {
+                    const nowPaused = musicWidget.classList.toggle('paused');
+                    localStorage.setItem('music-anim-paused', nowPaused);
+                });
+            }
         }
     };
 
@@ -159,6 +163,10 @@ import { categories } from '../pages/_categories';
         /* 스크롤바 숨기기 */
         scrollbar-width: none;
         -ms-overflow-style: none;
+
+        /* Fade effect at bottom */
+        mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
     }
 
     .lucode-sidebar::-webkit-scrollbar {
@@ -172,7 +180,7 @@ import { categories } from '../pages/_categories';
         
         /* 기존 상하 여백을 자식 요소에 주어, 이 여백도 함께 스크롤 되도록 만듦 */
         padding-top: 3rem;
-        padding-bottom: 5rem;
+        padding-bottom: 20vh; /* 페이드 아웃 영역을 뚫고 올라올 수 있도록 하단 여백 대폭 추가 */
     }
 
     /* Personal Space Styling */
@@ -372,7 +380,6 @@ import { categories } from '../pages/_categories';
     }
     
     .sidebar-group-title:hover { color: var(--signature-color); }
-    .sidebar-group-title::-webkit-details-marker { display: none; }
     .sidebar-group-title::before {
         content: '>';
         font-family: var(--font-mono);
@@ -383,9 +390,17 @@ import { categories } from '../pages/_categories';
         transform-origin: center;
         color: var(--muted-foreground);
     }
-    details[open] .sidebar-group-title::before { transform: rotate(90deg); }
+    
+    .category-folder.is-open .sidebar-group-title::before { transform: rotate(90deg); }
 
-    .folder-content { margin-top: 0.25rem; }
+    .folder-content {
+        display: none;
+        margin-top: 0.25rem; 
+    }
+    
+    .category-folder.is-open .folder-content {
+        display: block;
+    }
     .sidebar-list {
         list-style: none;
         padding: 0;

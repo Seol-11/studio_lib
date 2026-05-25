@@ -3,7 +3,6 @@ layout: ~/layouts/CategoryLayout.astro
 title: "OFDM Project"
 description: "FPGA 기반의 고속 통신 시스템 설계 및 OFDM 알고리즘 구현 기록"
 isCategory: true
-categoryId: "projects/OFDM"
 ---
 
 이 카테고리에서는 6G 통신 시스템의 핵심인 OFDM(Orthogonal Frequency Division Multiplexing) 기술을 FPGA로 구현하는 과정을 다룹니다.

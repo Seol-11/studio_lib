@@ -54,7 +54,7 @@ const totalCount = posts.length;
                             </div>
                         )}
                     </div>
-                    {post.frontmatter.heroImage && (
+                    {post.frontmatter.heroImage && post.frontmatter.heroImage !== 'none' && post.frontmatter.heroImage !== 'false' && post.frontmatter.heroImage !== 'null' && (
                         <a href={post.url} class="post-thumb-wrapper">
                             <img src={post.frontmatter.heroImage} alt={post.frontmatter.title} class="post-thumb" />
                         </a>
@@ -195,13 +195,13 @@ const totalCount = posts.length;
                 (searchInput as HTMLInputElement).value = q;
             }
             
-            const newSearchInput = searchInput.cloneNode(true) as HTMLInputElement;
-            searchInput.parentNode?.replaceChild(newSearchInput, searchInput);
-            
-            newSearchInput.addEventListener('input', () => { 
-                currentPage = 1; 
-                render(); 
-            });
+            if (!searchInput.hasAttribute('data-listener-attached')) {
+                searchInput.setAttribute('data-listener-attached', 'true');
+                searchInput.addEventListener('input', () => { 
+                    currentPage = 1; 
+                    render(); 
+                });
+            }
         }
 
         const subcatBtns = document.querySelectorAll('.subcat-btn');
@@ -222,33 +222,33 @@ const totalCount = posts.length;
         });
 
         document.querySelectorAll('.tag-btn').forEach(btn => {
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode?.replaceChild(newBtn, btn);
-
-            newBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const tag = (newBtn as HTMLElement).getAttribute('data-tag');
-                if (!tag) return;
-                
-                if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-                    const activeSearchInput = document.getElementById('post-search') as HTMLInputElement;
-                    if (activeSearchInput) {
-                        activeSearchInput.value = tag;
-                        activeSearchInput.dispatchEvent(new Event('input'));
-                        window.history.pushState({}, '', `/?q=${tag}`);
-                        
-                        const listWrapper = document.querySelector('.lucode-post-list-wrapper');
-                        if (listWrapper) {
-                            const top = listWrapper.getBoundingClientRect().top + window.scrollY - 100;
-                            window.scrollTo({ top, behavior: 'smooth' });
+            if (!btn.hasAttribute('data-listener-attached')) {
+                btn.setAttribute('data-listener-attached', 'true');
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const tag = btn.getAttribute('data-tag');
+                    if (!tag) return;
+                    
+                    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+                        const activeSearchInput = document.getElementById('post-search') as HTMLInputElement;
+                        if (activeSearchInput) {
+                            activeSearchInput.value = tag;
+                            activeSearchInput.dispatchEvent(new Event('input'));
+                            window.history.pushState({}, '', `/?q=${tag}`);
+                            
+                            const listWrapper = document.querySelector('.lucode-post-list-wrapper');
+                            if (listWrapper) {
+                                const top = listWrapper.getBoundingClientRect().top + window.scrollY - 100;
+                                window.scrollTo({ top, behavior: 'smooth' });
+                            }
                         }
+                    } else {
+                        window.location.href = `/?q=${tag}`;
                     }
-                } else {
-                    window.location.href = `/?q=${tag}`;
-                }
-            });
+                });
+            }
         });
 
         render();

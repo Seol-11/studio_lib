@@ -52,17 +52,17 @@
         // Theme Toggle
         const toggleBtn = document.getElementById("theme-toggle-header");
         if (toggleBtn) {
-            const newBtn = toggleBtn.cloneNode(true);
-            toggleBtn.parentNode?.replaceChild(newBtn, toggleBtn);
-            
-            newBtn.addEventListener("click", () => {
-                document.documentElement.classList.add('theme-toggling');
-                const isNowDark = document.documentElement.classList.toggle("dark");
-                localStorage.setItem("theme", isNowDark ? "dark" : "light");
-                setTimeout(() => {
-                    document.documentElement.classList.remove('theme-toggling');
-                }, 50);
-            });
+            if (!toggleBtn.hasAttribute('data-listener-attached')) {
+                toggleBtn.setAttribute('data-listener-attached', 'true');
+                toggleBtn.addEventListener("click", () => {
+                    document.documentElement.classList.add('theme-toggling');
+                    const isNowDark = document.documentElement.classList.toggle("dark");
+                    localStorage.setItem("theme", isNowDark ? "dark" : "light");
+                    setTimeout(() => {
+                        document.documentElement.classList.remove('theme-toggling');
+                    }, 50);
+                });
+            }
         }
         
         // Active Menu Highlight
@@ -91,15 +91,15 @@
         // Mobile Menu Logic
         const mobileBtn = document.getElementById('mobile-menu-btn');
         if (mobileBtn) {
-            const newMobileBtn = mobileBtn.cloneNode(true);
-            mobileBtn.parentNode?.replaceChild(newMobileBtn, mobileBtn);
-
-            newMobileBtn.addEventListener('click', () => {
-                const leftSidebar = document.querySelector('.lucode-sidebar') || document.querySelector('.left-sidebar');
-                if (leftSidebar) {
-                    leftSidebar.classList.toggle('mobile-open');
-                }
-            });
+            if (!mobileBtn.hasAttribute('data-listener-attached')) {
+                mobileBtn.setAttribute('data-listener-attached', 'true');
+                mobileBtn.addEventListener('click', () => {
+                    const leftSidebar = document.querySelector('.lucode-sidebar') || document.querySelector('.left-sidebar');
+                    if (leftSidebar) {
+                        leftSidebar.classList.toggle('mobile-open');
+                    }
+                });
+            }
         }
 
         // Search Logic
@@ -147,20 +147,19 @@
         };
 
         if (searchBtn) {
-            const newSearchBtn = searchBtn.cloneNode(true);
-            searchBtn.parentNode?.replaceChild(newSearchBtn, searchBtn);
-            newSearchBtn.addEventListener('click', openSearch);
-
-            if (closeSearchBtn) {
-                const newCloseBtn = closeSearchBtn.cloneNode(true);
-                closeSearchBtn.parentNode?.replaceChild(newCloseBtn, closeSearchBtn);
-                newCloseBtn.addEventListener('click', closeSearch);
+            if (!searchBtn.hasAttribute('data-listener-attached')) {
+                searchBtn.setAttribute('data-listener-attached', 'true');
+                searchBtn.addEventListener('click', openSearch);
             }
 
-            if (backdrop) {
-                const newBackdrop = backdrop.cloneNode(true);
-                backdrop.parentNode?.replaceChild(newBackdrop, backdrop);
-                newBackdrop.addEventListener('click', closeSearch);
+            if (closeSearchBtn && !closeSearchBtn.hasAttribute('data-listener-attached')) {
+                closeSearchBtn.setAttribute('data-listener-attached', 'true');
+                closeSearchBtn.addEventListener('click', closeSearch);
+            }
+
+            if (backdrop && !backdrop.hasAttribute('data-listener-attached')) {
+                backdrop.setAttribute('data-listener-attached', 'true');
+                backdrop.addEventListener('click', closeSearch);
             }
 
             const handleKeydown = (e: KeyboardEvent) => {
@@ -175,11 +174,9 @@
             window.removeEventListener('keydown', handleKeydown);
             window.addEventListener('keydown', handleKeydown);
 
-            if (searchInput) {
-                const newSearchInput = searchInput.cloneNode(true) as HTMLInputElement;
-                searchInput.parentNode?.replaceChild(newSearchInput, searchInput);
-                
-                newSearchInput.addEventListener('input', (e) => {
+            if (searchInput && !searchInput.hasAttribute('data-listener-attached')) {
+                searchInput.setAttribute('data-listener-attached', 'true');
+                searchInput.addEventListener('input', (e) => {
                     const query = (e.target as HTMLInputElement).value;
                     const resultsContainer = document.getElementById('search-results');
                     if (!resultsContainer) return;

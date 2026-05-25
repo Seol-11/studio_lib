@@ -4,7 +4,6 @@ title: "기초 툴 사용법"
 date: "2026-05-25"
 description: "Bash, Git, vim, markdown, tmux, etc. 사용법"
 tags: ["reference", "tools", "linux"]
-category: "study/reference"
 heroImage: none
 ---
 

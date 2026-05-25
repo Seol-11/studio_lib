@@ -2,19 +2,35 @@
 import BlogLayout from './BlogLayout.astro';
 import PostList from '../components/PostList.astro';
 import GiscusComments from '../components/GiscusComments.astro';
+import { categories } from '../pages/_categories';
 
 const { frontmatter, headings } = Astro.props;
 
+// 모든 카테고리 경로 평탄화 (끝의 슬래시 제거하여 통일)
+const allCategoryPaths = categories
+    .filter(c => c.type === 'folder')
+    .flatMap(c => (c as any).items ? (c as any).items.map((item: any) => item.path.replace(/\/$/, '')) : []);
+
+function getCategoryPathFromUrl(url: string | undefined) {
+    if (!url) return null;
+    const normalizedUrl = url.replace(/\/$/, '');
+    return allCategoryPaths
+        .filter(catPath => normalizedUrl.startsWith(catPath))
+        .sort((a, b) => b.length - a.length)[0] || null;
+}
+
 // 같은 카테고리의 포스트들을 불러오기
 const allPosts = Object.values(import.meta.glob('../pages/**/*.md', { eager: true })) as any[];
-const currentPath = Astro.url.pathname;
+const currentPath = Astro.url.pathname.replace(/\/$/, '');
+const currentCategoryPath = getCategoryPathFromUrl(currentPath);
 
 const categoryPosts = allPosts.filter(post => {
     const fileName = post.file.split('/').pop();
     if (fileName.startsWith('_') || post.frontmatter.isCategory) return false;
     if (currentPath === post.url || currentPath === post.url + '/') return false;
-    return post.frontmatter.category && frontmatter.category && 
-           post.frontmatter.category === frontmatter.category;
+    
+    const postCategoryPath = getCategoryPathFromUrl(post.url);
+    return postCategoryPath && currentCategoryPath && postCategoryPath === currentCategoryPath;
 })
 .sort((a, b) => new Date(b.frontmatter.date || 0).valueOf() - new Date(a.frontmatter.date || 0).valueOf());
 ---

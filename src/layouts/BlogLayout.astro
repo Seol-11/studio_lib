@@ -132,8 +132,19 @@ const {
         overflow-y: auto;
         padding: var(--space-2xl) var(--space-xl);
         border-left: none; /* Removed border */
+        
+        /* Hide scrollbar */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        
+        /* Fade effect at bottom */
+        mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
     }
 
+    .lucode-toc-sidebar::-webkit-scrollbar {
+        display: none;
+    }
 
     @media (min-width: 1280px) {
         .lucode-toc-sidebar {

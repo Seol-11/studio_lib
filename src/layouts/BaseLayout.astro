@@ -355,6 +355,17 @@ const {
         }
     }
 
+    /* Disable all view transitions animations globally */
+    ::view-transition-group(root),
+    ::view-transition-old(root),
+    ::view-transition-new(root),
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation-duration: 0s !important;
+        animation-name: none !important;
+    }
+
     /* Disable view transitions on mobile for immediate changes */
     @media (max-width: 768px) {
         ::view-transition-group(root),
