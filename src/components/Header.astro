@@ -241,7 +241,7 @@
     .brand {
         font-family: var(--font-mono);
         font-weight: 800;
-        font-size: 1.2rem;
+        font-size: var(--font-size-brand);
         color: var(--foreground);
         text-decoration: none;
         letter-spacing: -0.5px;
@@ -271,7 +271,7 @@
 
     .nav-item {
         font-family: var(--font-mono);
-        font-size: 0.85rem;
+        font-size: var(--font-size-nav);
         color: var(--muted-foreground);
         text-decoration: none;
         text-transform: uppercase;
@@ -366,7 +366,7 @@
         background: var(--muted);
         border: none;
         color: var(--muted-foreground);
-        font-size: 0.7rem;
+        font-size: var(--font-size-sidebar-sm);
         padding: 0.2rem 0.5rem;
         border-radius: 4px;
         cursor: pointer;
@@ -382,7 +382,7 @@
         padding: 2rem;
         text-align: center;
         color: var(--muted-foreground);
-        font-size: 0.9rem;
+        font-size: var(--font-size-nav);
     }
     :global(.search-result-item) {
         display: block;
@@ -408,7 +408,7 @@
     }
     :global(.search-result-desc) {
         color: var(--muted-foreground);
-        font-size: 0.85rem;
+        font-size: var(--font-size-nav);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

@@ -6,6 +6,7 @@ export async function GET() {
     .filter((post) => {
       if (post.file && post.file.split('/').pop().startsWith('_')) return false;
       if (post.frontmatter && post.frontmatter.isCategory) return false;
+      if (post.frontmatter && post.frontmatter.hide) return false;
       if (!post.frontmatter || !post.frontmatter.title) return false;
       return true;
     })

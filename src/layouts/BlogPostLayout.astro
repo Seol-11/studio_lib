@@ -26,11 +26,10 @@ const currentCategoryPath = getCategoryPathFromUrl(currentPath);
 
 const categoryPosts = allPosts.filter(post => {
     const fileName = post.file.split('/').pop();
-    if (fileName.startsWith('_') || post.frontmatter.isCategory) return false;
+    if (fileName.startsWith('_') || post.frontmatter.isCategory || post.frontmatter.hide) return false;
     if (currentPath === post.url || currentPath === post.url + '/') return false;
-    
-    const postCategoryPath = getCategoryPathFromUrl(post.url);
-    return postCategoryPath && currentCategoryPath && postCategoryPath === currentCategoryPath;
+
+    const postCategoryPath = getCategoryPathFromUrl(post.url);    return postCategoryPath && currentCategoryPath && postCategoryPath === currentCategoryPath;
 })
 .sort((a, b) => new Date(b.frontmatter.date || 0).valueOf() - new Date(a.frontmatter.date || 0).valueOf());
 ---
@@ -38,6 +37,7 @@ const categoryPosts = allPosts.filter(post => {
     <article class="sl-markdown-content">
         <header class="post-header">
             <h1 id="_top">{frontmatter.title}</h1>
+            {frontmatter.hide && <span class="hide-label">HIDDEN</span>}
             <div class="post-meta">
                 <span>{frontmatter.date}</span>
                 {frontmatter.tags && frontmatter.tags.map((tag: string) => (
@@ -66,7 +66,18 @@ const categoryPosts = allPosts.filter(post => {
 
 <style>
     /* Layout specific styles for blog posts */
-    .post-header { margin-bottom: 3rem; }
+    .post-header { margin-bottom: 3rem; position: relative; }
+    .hide-label {
+        display: inline-block;
+        background-color: #ffeb3b;
+        color: #000;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: bold;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+        vertical-align: middle;
+    }
     .post-meta {
         display: flex;
         gap: 0.5rem 1rem;

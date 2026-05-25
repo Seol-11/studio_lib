@@ -29,10 +29,9 @@ const allPosts = Object.values(import.meta.glob('../pages/**/*.md', { eager: tru
 // 메인 화면용, 카테고리용 md 파일 제외, 그리고 이 카테고리에 맞는 포스트만 필터링
 const posts = allPosts.filter(post => {
     const fileName = post.file.split('/').pop();
-    if (fileName.startsWith('_') || post.frontmatter.isCategory) return false;
-    
-    const postCategoryPath = getCategoryPathFromUrl(post.url);
-    if (!postCategoryPath) return false;
+    if (fileName.startsWith('_') || post.frontmatter.isCategory || post.frontmatter.hide) return false;
+
+    const postCategoryPath = getCategoryPathFromUrl(post.url);    if (!postCategoryPath) return false;
     
     return postCategoryPath === currentCategoryPath;
 }).map(post => {
@@ -58,8 +57,8 @@ const subCategories = Array.from(new Set(posts.map(p => p.subCategory).filter(Bo
 
 // 최신순 정렬
 const sortedPosts = posts.sort((a, b) => {
-    const dateA = new Date(a.frontmatter.date || 0).valueOf();
-    const dateB = new Date(b.frontmatter.date || 0).valueOf();
+    const dateA = new Date(a.frontmatter.date || 0).getTime();
+    const dateB = new Date(b.frontmatter.date || 0).getTime();
     return dateB - dateA;
 });
 ---

@@ -14,7 +14,7 @@ import { categories } from '../pages/_categories';
             <div class="nature-box">
                 <div class="nature-image" style="background-image: url('https://i.pinimg.com/1200x/98/90/4e/98904e5111b35f7cecaeefe80ba51837.jpg');"></div>
                 <div class="nature-overlay">
-                    <span class="location-tag">NEO_TOKYO // CORE</span>
+                    <span class="location-tag">Seol_11</span>
                     <span class="status-tag">STATUS: ONLINE</span>
                 </div>
             </div>
@@ -222,8 +222,8 @@ import { categories } from '../pages/_categories';
         font-family: var(--font-mono);
         pointer-events: none;
     }
-    .location-tag { font-size: 0.55rem; opacity: 0.7; letter-spacing: 0.5px; }
-    .status-tag { font-size: 0.65rem; font-weight: 700; color: var(--signature-color); margin-top: 2px; }
+    .location-tag { font-size: var(--font-size-sidebar-xs); opacity: 0.7; letter-spacing: 0.5px; }
+    .status-tag { font-size: var(--font-size-sidebar-xs); font-weight: 700; color: var(--signature-color); margin-top: 2px; }
 
     /* Interactive Compact Music Widget */
     .playlist-widget {
@@ -270,7 +270,7 @@ import { categories } from '../pages/_categories';
     .track-scroll-wrapper {
         display: flex;
         width: max-content;
-        font-size: 0.7rem;
+        font-size: var(--font-size-sidebar-sm);
         color: var(--foreground);
         animation: scroll-text 15s linear infinite;
     }
@@ -352,7 +352,7 @@ import { categories } from '../pages/_categories';
 
     .group-title {
         font-family: var(--font-mono);
-        font-size: 0.7rem;
+        font-size: var(--font-size-sidebar-sm);
         font-weight: 700;
         color: var(--foreground);
         opacity: 0.6;
@@ -367,7 +367,7 @@ import { categories } from '../pages/_categories';
     }
 
     .sidebar-group-title {
-        font-size: 0.8rem;
+        font-size: var(--font-size-sidebar);
         font-weight: 600;
         color: var(--foreground);
         padding: 0.25rem 0.5rem;
@@ -383,7 +383,7 @@ import { categories } from '../pages/_categories';
     .sidebar-group-title::before {
         content: '>';
         font-family: var(--font-mono);
-        font-size: 0.7rem;
+        font-size: var(--font-size-sidebar-sm);
         display: inline-block;
         margin-right: 0.5rem;
         transition: transform 0.2s ease-in-out;
@@ -414,7 +414,7 @@ import { categories } from '../pages/_categories';
     .sidebar-link {
         display: block;
         padding: 0.375rem 0.5rem;
-        font-size: 0.8rem;
+        font-size: var(--font-size-sidebar);
         text-decoration: none;
         color: var(--muted-foreground);
         border-radius: 0.375rem;

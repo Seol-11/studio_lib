@@ -33,6 +33,7 @@
     --tracking-normal: 0em;         /* 본문용 기본 자간 */
     
     --leading-tight: 1.25;          /* 제목용 좁은 행간 */
+    --leading-snug: 1.375;          /* 중간 제목용 행간 */
     --leading-normal: 1.5;          /* [★] 본문용 표준 행간 (가독성 핵심) */
     
     --weight-normal: 400;
@@ -56,6 +57,7 @@
     --content-py: var(--space-2xl);     /* 본문 상하 여백 */
 
     /* --- 5. FONT SIZES: 글자 크기 --- */
+    --size-2xs: 0.65rem;            /* 10.4px */
     --size-xs: 0.75rem;             /* 12px */
     --size-sm: 0.875rem;            /* 14px */
     --size-base: 1rem;              /* 16px */
@@ -65,11 +67,22 @@
     --size-3xl: 1.875rem;           /* 30px */
     --size-4xl: 2.25rem;            /* 36px */
 
-    --font-size-body: clamp(0.9375rem, 0.915rem + 0.1vw, 1rem); /* [★] 반응형 본문 크기 */
+    /* Semantic Font Sizes: 컴포넌트별 용도 기반 [★] */
+    --font-size-body: clamp(1.1rem, 0.915rem + 0.1vw, 1rem); /* [★] 반응형 본문 글꼴 크기 */
     --font-size-h1: 1.75rem;        /* 대제목 크기 */
-    --font-size-h2: 1.25rem;        /* 중제목 크기 */
+    --font-size-h2: 1.3rem;        /* 중제목 크기 */
+    --font-size-h3: 1.125rem;       /* 소제목 크기 */
     --font-size-meta: 0.8rem;       /* 캡션 및 부가 정보 크기 */
-    --font-size-code: 0.875rem;     /* 코드 블록 크기 */
+    --font-size-code: 0.9rem;       /* 코드 블록 크기 */
+    
+    --font-size-brand: 1.2rem;       /* 로고 및 브랜드 */
+    --font-size-nav: 0.85rem;        /* 상단 네비게이션 */
+    --font-size-sidebar: 0.8rem;     /* 사이드바 메뉴 */
+    --font-size-sidebar-sm: 0.7rem;  /* 사이드바 보조 정보 */
+    --font-size-sidebar-xs: 0.55rem; /* 사이드바 초소형 텍스트 */
+    --font-size-list-title: 1.25rem; /* 목록 제목 */
+    --font-size-list-desc: 0.9375rem;/* 목록 요약 */
+    --font-size-tag: 0.75rem;        /* 태그 */
 
     /* --- 6. LAYOUT: 구조 설계 --- */
     --header-height: 60px;          /* [★] 상단 헤더 높이 */
@@ -117,30 +130,214 @@ html.dark {
     --code-border: #333333;
 }
 
-/* 
-   --- [!] STYLE AUDIT LOG: 프로젝트 내 잔여 고정 수치 및 위치 ---
-   아래 항목들은 개별 파일에 고정 수치(Hardcoded)로 남아있는 값들입니다.
-   추후 일괄 리팩토링이나 디자인 가이드 수정 시 참고하세요.
+/* --- 10. GLOBAL MARKDOWN CONTENT STYLES --- */
+/* 마크다운 본문 영역 스타일: 블로그 포스트, 문서 등 실제 컨텐츠가 표시되는 곳 */
+.sl-markdown-content {
+    font-family: 'Pretendard', var(--font-sans);
+    letter-spacing: var(--tracking-normal);
+    word-break: keep-all; /* 단어 단위로 줄바꿈 (한글 가독성) */
+    font-size: var(--font-size-body);
+    line-height: var(--leading-normal);
+}
 
-   1. COLORS & EFFECTS
-      - 코드 블록 상세색: BaseLayout (L223-232)
-      - 테이블 줄무늬 색상: BaseLayout (L206)
-      - 사이드바 그라데이션: BlogSidebar (L204)
-      - 요소 미세 그림자들: BlogSidebar (L223, L304), Header (L331)
+/* 굵은 글씨 설정 */
+.sl-markdown-content strong,
+.sl-markdown-content b {
+    font-weight: 550;
+}
 
-   2. FONT SIZES
-      - 사이드바 상세정보 (0.55-0.7rem): BlogSidebar, BlogLayout
-      - 포스트 목록 상세 (0.75-0.93rem): PostList, BlogPostLayout
-      - 메뉴 및 로고 (0.85-1.2rem): Header
-      - 페이지네이션 및 코드 (0.87-0.9rem): BaseLayout
+/* 모든 제목(h1~h6) 공통 설정 */
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
+    font-weight: 500;
+    letter-spacing: var(--tracking-tight);
+    color: var(--foreground);
+    line-height: var(--leading-tight);
+}
 
-   3. SPACING & SIZING
-      - 컴포넌트 고정 규격: BlogSidebar (프로필), PostList (썸네일), LogWidget (패널), Header (검색창)
-      - 본문 요소 미세 여백: BaseLayout (인용구, 리스트), PostList (태그)
-      - 타임라인 특수 구조: daily.astro (4px, 31px 등)
+/* 대제목 (H1) */
+.sl-markdown-content h1 {
+    font-size: var(--font-size-h1);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    margin-bottom: var(--space-md);
+}
 
-   4. SYSTEM & BREAKPOINTS
-      - 반응형 중단점 (480-1280px): 모든 Layout 및 Component 파일의 @media 섹션
-      - 시스템 계층 (z-index): BlogSidebar (모바일 메뉴), Header/LogWidget (최상위 요소)
-      - 특수 효과: LogWidget (맥박 애니메이션), BlogSidebar (호버 스케일)
-*/
+/* 중제목 (H2) */
+.sl-markdown-content h2 {
+    font-size: var(--font-size-h2);
+    font-weight: 500;
+    line-height: var(--leading-snug);
+    margin-top: var(--space-2xl); /* 위쪽 여백 */
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-sm);
+}
+
+/* 소제목 (H3) */
+.sl-markdown-content h3 {
+    font-size: var(--font-size-h3);
+    margin-top: 2.25rem;
+}
+
+/* 본문 문단 (p) */
+.sl-markdown-content p {
+    line-height: 1.4; /* 줄 간격 */
+    margin-bottom: 1.125rem; /* 아래쪽 여백 */
+    color: var(--foreground);
+}
+
+/* 모바일 화면 대응 */
+@media (max-width: 600px) {
+    .sl-markdown-content p {
+        line-height: 1.77;
+        margin-bottom: 1rem;
+    }
+    .sl-markdown-content h2 { margin-top: 2.5rem; }
+}
+
+/* 링크 스타일 */
+.sl-markdown-content a:not([class]) {
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+    text-decoration-color: var(--signature-color);
+    color: var(--signature-color);
+    font-weight: 500;
+    transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+/* 인용문 (blockquote) */
+.sl-markdown-content blockquote {
+    border-left: 4px solid var(--signature-color);
+    padding: 0.5rem 1rem;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    margin: 1.125rem 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-style: italic;
+}
+
+/* 리스트 (ul, ol) */
+.sl-markdown-content ul, .sl-markdown-content ol {
+    margin-bottom: 1.125rem;
+    padding-left: 1.5rem;
+}
+
+/* 리스트 항목 (li) */
+.sl-markdown-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.75;
+}
+
+/* 구분선 (hr) - 위아래 여백 조절 가능 */
+.sl-markdown-content hr {
+    border: 0;
+    border-top: 3px solid var(--border-color);
+    margin-top: 1rem;    /* 위쪽 여백 [★] 조절 가능 */
+    margin-bottom: 0rem; /* 아래쪽 여백 [★] 조절 가능 */
+}
+
+
+/* 테이블 레이아웃 최적화 */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 2rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+/* 테이블 본체 */
+.sl-markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    min-width: 500px;
+}
+
+/* 테이블 셀 */
+.sl-markdown-content th,
+.sl-markdown-content td {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+}
+
+/* 테이블 헤더 */
+.sl-markdown-content th {
+    background-color: var(--muted);
+    font-weight: 600;
+    text-align: left;
+}
+
+/* 테이블 줄무늬 효과 */
+.sl-markdown-content tr:nth-child(even) {
+    background-color: var(--table-zebra);
+}
+
+/* 코드 블록 (pre) */
+.sl-markdown-content pre {
+    padding: 1.25rem;
+    border-radius: 10px;
+    margin: 1.75rem 0;
+    font-size: var(--font-size-code);
+    line-height: 1.6;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    border: 1px solid var(--border-color);
+}
+
+/* 코드 블록 - 라이트 모드 */
+html:not(.dark) .sl-markdown-content pre {
+    background-color: var(--code-bg) !important;
+    border-color: var(--code-border);
+    color: #24292e !important;
+}
+
+/* 코드 블록 - 다크 모드 */
+html.dark .sl-markdown-content pre {
+    background-color: #262626 !important;
+    border-color: #333333;
+    color: #c9d1d9 !important;
+}
+
+/* 다크 모드 구문 강조(Syntax Highlighting) 대응 */
+html.dark .sl-markdown-content pre code span {
+    color: var(--shiki-dark) !important;
+    font-style: var(--shiki-dark-font-style, inherit) !important;
+    font-weight: var(--shiki-dark-font-weight, inherit) !important;
+    text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
+}
+
+/* 인라인 코드 (문장 중간의 `code`) */
+.sl-markdown-content code:not(pre code) {
+    background-color: var(--muted);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: var(--font-mono);
+    color: var(--signature-color);
+    border: 1px solid var(--border-color);
+}
+
+/* 코드 블록 스크롤바 스타일 */
+.sl-markdown-content pre::-webkit-scrollbar { height: 8px; }
+.sl-markdown-content pre::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+/* 이미지 스타일 */
+.sl-markdown-content img {
+    max-width: 100%;
+    margin: 2rem 0 1rem 0;
+    border: 1px solid var(--border-color);
+}
+
+/* 이미지 캡션 (이미지 바로 아래 이탤릭체) */
+.sl-markdown-content img + em {
+    display: block;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    margin-bottom: 2rem;
+    font-style: normal;
+}
