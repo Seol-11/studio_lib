@@ -180,8 +180,8 @@ html.dark {
 
 /* 본문 문단 (p) */
 .sl-markdown-content p {
-    line-height: 1.4; /* 줄 간격 */
-    margin-bottom: 1.125rem; /* 아래쪽 여백 */
+    line-height: 1.6; /* 줄 간격 */
+    margin-bottom: 0.35rem; /* 아래쪽 여백 */
     color: var(--foreground);
 }
 
@@ -189,7 +189,7 @@ html.dark {
 @media (max-width: 600px) {
     .sl-markdown-content p {
         line-height: 1.77;
-        margin-bottom: 1rem;
+        margin-bottom: 0.35rem;
     }
     .sl-markdown-content h2 { margin-top: 2.5rem; }
 }
