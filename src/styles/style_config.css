@@ -68,7 +68,7 @@
     --size-4xl: 2.25rem;            /* 36px */
 
     /* Semantic Font Sizes: 컴포넌트별 용도 기반 [★] */
-    --font-size-body: clamp(1.1rem, 0.915rem + 0.1vw, 1rem); /* [★] 반응형 본문 글꼴 크기 */
+    --font-size-body: clamp(1rem, 0.915rem + 0.1vw, 1rem); /* [★] 반응형 본문 글꼴 크기 */
     --font-size-h1: 1.75rem;        /* 대제목 크기 */
     --font-size-h2: 1.3rem;        /* 중제목 크기 */
     --font-size-h3: 1.125rem;       /* 소제목 크기 */
