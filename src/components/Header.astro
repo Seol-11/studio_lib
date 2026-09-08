@@ -13,17 +13,17 @@
                 <a href="/about" class="nav-item">About</a>
             </nav>
             
-            <button id="search-btn" class="search-btn" aria-label="Search">
+            <button id="search-btn" class="search-btn" type="button" aria-label="검색 열기" aria-controls="search-modal" aria-expanded="false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
 
-            <button id="theme-toggle-header" class="theme-toggle-btn" aria-label="Toggle Dark Mode">
+            <button id="theme-toggle-header" class="theme-toggle-btn" type="button" aria-label="다크 모드 전환">
                 <svg class="sun" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="18.36" x2="5.64" y2="16.92"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                 <svg class="moon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </button>
 
             <!-- Mobile Menu Toggle -->
-            <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu">
+            <button id="mobile-menu-btn" class="mobile-menu-btn" type="button" aria-label="메뉴 열기" aria-expanded="false">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         </div>
@@ -31,13 +31,14 @@
 </header>
 
 <!-- Search Modal -->
-<div id="search-modal" class="search-modal">
+<div id="search-modal" class="search-modal" role="dialog" aria-modal="true" aria-labelledby="search-label" aria-hidden="true">
     <div class="search-modal-backdrop"></div>
     <div class="search-modal-content">
+        <h2 id="search-label" class="sr-only">블로그 검색</h2>
         <div class="search-input-wrapper">
             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" id="search-input" placeholder="Search posts..." autocomplete="off" />
-            <button id="close-search" class="close-search-btn">ESC</button>
+            <button id="close-search" class="close-search-btn" type="button" aria-label="검색 닫기">ESC</button>
         </div>
         <div id="search-results" class="search-results">
             <div class="search-empty">Type to start searching...</div>
@@ -46,7 +47,15 @@
 </div>
 
 <script>
-    import Fuse from 'fuse.js';
+    interface SearchItem {
+        title: string;
+        description: string;
+        url: string;
+        date: string;
+        tags: string[];
+    }
+
+    let previousKeydownHandler: ((event: KeyboardEvent) => void) | undefined;
 
     const initHeader = () => {
         // Theme Toggle
@@ -78,7 +87,7 @@
                     item.classList.add('active');
                 }
             } else if (href === '/') {
-                if (currentPath === '/' || (!currentPath.startsWith('/about') && !currentPath.startsWith('/log') && !currentPath.startsWith('/study') && !currentPath.startsWith('/projects'))) {
+                if (!currentPath.startsWith('/about')) {
                     item.classList.add('active');
                 }
             } else {
@@ -96,7 +105,8 @@
                 mobileBtn.addEventListener('click', () => {
                     const leftSidebar = document.querySelector('.lucode-sidebar') || document.querySelector('.left-sidebar');
                     if (leftSidebar) {
-                        leftSidebar.classList.toggle('mobile-open');
+                        const isOpen = leftSidebar.classList.toggle('mobile-open');
+                        mobileBtn.setAttribute('aria-expanded', String(isOpen));
                     }
                 });
             }
@@ -106,24 +116,40 @@
         const searchBtn = document.getElementById('search-btn');
         const searchModal = document.getElementById('search-modal');
         const closeSearchBtn = document.getElementById('close-search');
-        const searchInput = document.getElementById('search-input');
+        const searchInput = document.querySelector<HTMLInputElement>('#search-input');
         const searchResults = document.getElementById('search-results');
         const backdrop = document.querySelector('.search-modal-backdrop');
 
-        let searchData: any[] | null = null;
-        let fuse: Fuse<any> | null = null;
+        let searchData: SearchItem[] | null = null;
+        let fuse: import('fuse.js').default<SearchItem> | null = null;
+        let lastFocusedElement: HTMLElement | null = null;
+
+        const showMessage = (message: string) => {
+            if (!searchResults) return;
+            const empty = document.createElement('div');
+            empty.className = 'search-empty';
+            empty.textContent = message;
+            searchResults.replaceChildren(empty);
+        };
 
         const openSearch = async () => {
             if (!searchModal) return;
+            lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
             searchModal.classList.add('active');
+            searchModal.setAttribute('aria-hidden', 'false');
+            searchBtn?.setAttribute('aria-expanded', 'true');
             searchInput?.focus();
             document.body.style.overflow = 'hidden';
             
             if (!searchData) {
                 try {
-                    const res = await fetch('/search.json');
-                    searchData = await res.json();
-                    fuse = new Fuse(searchData as any[], {
+                    const [{ default: Fuse }, res] = await Promise.all([
+                        import('fuse.js'),
+                        fetch('/search.json'),
+                    ]);
+                    if (!res.ok) throw new Error(`Search index request failed: ${res.status}`);
+                    searchData = await res.json() as SearchItem[];
+                    fuse = new Fuse(searchData, {
                         keys: [
                             { name: 'title', weight: 0.7 },
                             { name: 'tags', weight: 0.5 },
@@ -132,8 +158,10 @@
                         threshold: 0.3,
                         ignoreLocation: true
                     });
+                    if (searchInput?.value) searchInput.dispatchEvent(new Event('input'));
                 } catch (e) {
                     console.error('Failed to load search data', e);
+                    showMessage('검색 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
                 }
             }
         };
@@ -141,9 +169,12 @@
         const closeSearch = () => {
             if (!searchModal) return;
             searchModal.classList.remove('active');
+            searchModal.setAttribute('aria-hidden', 'true');
+            searchBtn?.setAttribute('aria-expanded', 'false');
             document.body.style.overflow = '';
             if (searchInput) (searchInput as HTMLInputElement).value = '';
-            if (searchResults) searchResults.innerHTML = '<div class="search-empty">Type to start searching...</div>';
+            showMessage('Type to start searching...');
+            lastFocusedElement?.focus();
         };
 
         if (searchBtn) {
@@ -170,9 +201,25 @@
                     e.preventDefault();
                     openSearch();
                 }
+                if (e.key === 'Tab' && searchModal?.classList.contains('active')) {
+                    const focusable = Array.from(searchModal.querySelectorAll<HTMLElement>(
+                        'button:not([disabled]), input:not([disabled]), a[href]',
+                    ));
+                    const first = focusable[0];
+                    const last = focusable.at(-1);
+                    if (!first || !last) return;
+                    if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                }
             };
-            window.removeEventListener('keydown', handleKeydown);
+            if (previousKeydownHandler) window.removeEventListener('keydown', previousKeydownHandler);
             window.addEventListener('keydown', handleKeydown);
+            previousKeydownHandler = handleKeydown;
 
             if (searchInput && !searchInput.hasAttribute('data-listener-attached')) {
                 searchInput.setAttribute('data-listener-attached', 'true');
@@ -182,25 +229,33 @@
                     if (!resultsContainer) return;
 
                     if (!query) {
-                        resultsContainer.innerHTML = '<div class="search-empty">Type to start searching...</div>';
+                        showMessage('Type to start searching...');
                         return;
                     }
                     if (!fuse) return;
 
                     const fuseResults = fuse.search(query);
-                    const results = fuseResults.map((r: any) => r.item);
+                    const results = fuseResults.map((result) => result.item);
 
                     if (results.length === 0) {
-                        resultsContainer.innerHTML = '<div class="search-empty">No results found for "'+query+'"</div>';
+                        showMessage(`No results found for "${query}"`);
                         return;
                     }
 
-                    resultsContainer.innerHTML = results.map((item: any) => `
-                        <a href="${item.url}" class="search-result-item">
-                            <div class="search-result-title">${item.title}</div>
-                            <div class="search-result-desc">${item.description}</div>
-                        </a>
-                    `).join('');
+                    const nodes = results.map((item) => {
+                        const link = document.createElement('a');
+                        link.href = item.url;
+                        link.className = 'search-result-item';
+                        const title = document.createElement('div');
+                        title.className = 'search-result-title';
+                        title.textContent = item.title;
+                        const description = document.createElement('div');
+                        description.className = 'search-result-desc';
+                        description.textContent = item.description;
+                        link.append(title, description);
+                        return link;
+                    });
+                    resultsContainer.replaceChildren(...nodes);
                 });
             }
         }
@@ -210,6 +265,17 @@
 </script>
 
 <style>
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
     /* Header Styles */
     .sys-header {
         position: fixed;

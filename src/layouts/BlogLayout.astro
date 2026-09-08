@@ -7,15 +7,21 @@ export interface Props {
     title?: string;
     description?: string;
     headings?: { depth: number; slug: string; text: string }[];
+    robots?: string;
+    pageType?: 'website' | 'article';
+    image?: string;
 }
 
 const { 
     title = "Blog | Studio.lib", 
     description = "Analog Log & Study Notes",
-    headings 
+    headings,
+    robots,
+    pageType,
+    image,
 } = Astro.props;
 ---
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} robots={robots} pageType={pageType} image={image}>
     <Header />
 
     <div class="lucode-container">
@@ -49,8 +55,11 @@ const {
     </div>
 
     <script>
+        let tocObserver: IntersectionObserver | undefined;
+
         const initTOC = () => {
-            const tocLinks = document.querySelectorAll('.toc-link');
+            tocObserver?.disconnect();
+            const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc-link');
             const contentHeadings = Array.from(document.querySelectorAll('.sl-markdown-content h1[id], .sl-markdown-content h2[id], .sl-markdown-content h3[id], .sl-markdown-content h4[id]'));
             
             if (tocLinks.length === 0) return;
@@ -59,7 +68,8 @@ const {
             tocLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const targetId = link.getAttribute('href').substring(1);
+                    const targetId = link.hash.slice(1);
+                    if (!targetId) return;
                     const targetElement = document.getElementById(targetId);
                     
                     if (targetElement) {
@@ -68,7 +78,7 @@ const {
                         const offsetPosition = elementPosition + window.pageYOffset - offset;
                         
                         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                        window.history.replaceState(null, null, `#${targetId}`);
+                        window.history.replaceState(null, '', `#${targetId}`);
                     }
                 });
             });
@@ -79,7 +89,7 @@ const {
                 threshold: 1.0
             };
 
-            const observer = new IntersectionObserver((entries) => {
+            tocObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const id = entry.target.getAttribute('id');
@@ -90,7 +100,7 @@ const {
                 });
             }, observerOptions);
 
-            contentHeadings.forEach(h => observer.observe(h));
+            contentHeadings.forEach(h => tocObserver?.observe(h));
         };
 
         document.addEventListener('astro:page-load', initTOC);

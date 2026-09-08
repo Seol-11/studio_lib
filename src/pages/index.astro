@@ -2,37 +2,32 @@
 import BlogLayout from '../layouts/BlogLayout.astro';
 import PostList from '../components/PostList.astro';
 import * as BlogIndex from './_blog-index.md';
+import { getCollection } from 'astro:content';
+import { collectionEntryToPost, isPublishedPost, sortPostsByDate } from '../utils/posts';
 
 // pages 디렉토리 내부의 모든 마크다운 파일을 가져옵니다.
-const allPosts = Object.values(import.meta.glob('./**/*.md', { eager: true })) as any[];
+const allPosts = (await getCollection('posts')).map(collectionEntryToPost);
 
 // 메인 화면용, 카테고리용, 혹은 '_'로 시작하는 보조 마크다운 파일은 포스트 목록에서 제외합니다.
-const posts = allPosts.filter(post => {
-    const fileName = post.file.split('/').pop();
-    return !fileName.startsWith('_') && !post.frontmatter.isCategory && !post.frontmatter.hide;
-});
+const posts = allPosts.filter(isPublishedPost);
 
 // 날짜 기준으로 내림차순 정렬 (최신 글이 위로)
-const sortedPosts = posts.sort((a, b) => {
-    const dateA = new Date(a.frontmatter.date || 0).getTime();
-    const dateB = new Date(b.frontmatter.date || 0).getTime();
-    return dateB - dateA;
-});
+const sortedPosts = sortPostsByDate(posts);
 ---
 
 <BlogLayout title="Blog | Studio.lib">
-    <div class="sl-markdown-content">
+    <div>
         <header class="category-header">
             <h1 class="category-title" id="_top">{BlogIndex.frontmatter.title}</h1>
             {BlogIndex.frontmatter.description && <p class="category-meta">{BlogIndex.frontmatter.description}</p>}
         </header>
 
-        <div class="blog-index-content">
+        <div class="blog-index-content sl-markdown-content">
             <BlogIndex.Content />
         </div>
 
         <div class="category-posts-section">
-            <h2 id="recent-posts">Recent Posts</h2>
+            <h2 id="recent-posts" class="section-heading">Recent Posts</h2>
             <PostList posts={sortedPosts} />
         </div>
     </div>
@@ -42,7 +37,13 @@ const sortedPosts = posts.sort((a, b) => {
     .blog-index-content {
         margin-bottom: 0.5rem;
     }
-    #recent-posts {
-        margin-bottom: 0rem; /* Tightened from 1rem to 0.5rem */
+    .section-heading {
+        margin: 2.75rem 0 0;
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: var(--font-size-h2);
+        font-weight: var(--weight-semibold);
+        line-height: var(--leading-snug);
+        letter-spacing: var(--tracking-tight);
     }
 </style>

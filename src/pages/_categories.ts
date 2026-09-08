@@ -1,4 +1,13 @@
-export const categories = [
+export interface CategoryItem {
+    title: string;
+    path: string;
+}
+
+export type Category =
+    | { type: 'folder'; id: string; title: string; items: CategoryItem[] }
+    | { type: 'link'; title: string; path: string };
+
+export const categories: Category[] = [
     {
         type: 'folder',
         id: 'log',

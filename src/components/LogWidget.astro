@@ -5,7 +5,7 @@ const latestLog = logs[0];
 ---
 
 <div id="log-widget" class="log-widget-container" transition:persist="log-widget">
-    <button id="log-toggle" class="log-toggle-btn" aria-label="Toggle Log">
+    <button id="log-toggle" class="log-toggle-btn" type="button" aria-label="최근 일상 로그 열기" aria-controls="log-content-panel" aria-expanded="false">
         <span class="status-dot"></span>
         <span class="toggle-text">DAILY_LOG</span>
         <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
@@ -37,12 +37,14 @@ const latestLog = logs[0];
         if (isExpanded) {
             widget.classList.add('expanded');
         }
+        toggleBtn.setAttribute('aria-expanded', String(isExpanded));
 
         if (!toggleBtn.hasAttribute('data-listener-attached')) {
             toggleBtn.setAttribute('data-listener-attached', 'true');
             toggleBtn.addEventListener('click', () => {
                 const nowExpanded = widget.classList.toggle('expanded');
-                localStorage.setItem('log-widget-expanded', nowExpanded);
+                toggleBtn.setAttribute('aria-expanded', String(nowExpanded));
+                localStorage.setItem('log-widget-expanded', String(nowExpanded));
             });
         }
     };

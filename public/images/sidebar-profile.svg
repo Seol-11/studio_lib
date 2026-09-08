@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-labelledby="title description">
+  <title id="title">Studio.lib circuit landscape</title>
+  <desc id="description">A calm green circuit pattern over a dark gradient.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#18251f"/>
+      <stop offset="1" stop-color="#416451"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#a1cca5" stop-opacity=".2"/>
+      <stop offset=".5" stop-color="#d7efd9" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#a1cca5" stop-opacity=".15"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="360" fill="url(#bg)"/>
+  <g fill="none" stroke="url(#line)" stroke-width="3">
+    <path d="M0 92h120l38 38h128l42-42h126l35 35h231"/>
+    <path d="M0 224h88l48-48h115l58 58h138l45-45h226"/>
+    <path d="M178 0v74l38 38M535 360v-88l-36-36M357 0v88M357 234v126"/>
+  </g>
+  <g fill="#a1cca5">
+    <circle cx="120" cy="92" r="7"/><circle cx="286" cy="130" r="7"/>
+    <circle cx="454" cy="88" r="7"/><circle cx="136" cy="176" r="7"/>
+    <circle cx="309" cy="234" r="7"/><circle cx="447" cy="234" r="7"/>
+    <circle cx="357" cy="88" r="7"/>
+  </g>
+</svg>

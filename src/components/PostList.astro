@@ -1,6 +1,6 @@
 ---
 export interface Props {
-    posts: any[];
+    posts: import('../utils/posts').MarkdownPost[];
     subCategories?: string[];
 }
 
@@ -13,9 +13,10 @@ const subCategoryCounts = subCategories.reduce((acc, cat) => {
 }, {} as Record<string, number>);
 
 const totalCount = posts.length;
+const instanceId = `post-search-${Astro.url.pathname.replace(/[^a-zA-Z0-9]+/g, '-') || 'home'}`;
 ---
 
-<div class="lucode-post-list-wrapper">
+<div class="lucode-post-list-wrapper" data-post-list>
     {subCategories.length > 0 && (
         <div class="subcategory-filter">
             <button class="subcat-btn active" data-subcat="all">
@@ -29,7 +30,7 @@ const totalCount = posts.length;
         </div>
     )}
 
-    <div class="lucode-post-list" id="post-list-container">
+    <div class="lucode-post-list">
         {posts.length === 0 ? (
             <p class="empty-state">아직 작성된 글이 없습니다.</p>
         ) : (
@@ -41,9 +42,9 @@ const totalCount = posts.length;
                     data-subcat={post.subCategory || ''}
                 >
                     <div class="post-content-wrapper">
-                        <div class="post-date">
+                        <time class="post-date" datetime={post.frontmatter.date ? new Date(post.frontmatter.date).toISOString() : undefined}>
                             {post.frontmatter.date ? new Date(post.frontmatter.date).toISOString().split('T')[0] : 'No Date'}
-                        </div>
+                        </time>
                         <a href={post.url} class="post-link">
                             <h2 class="post-title">{post.frontmatter.title}</h2>
                         </a>
@@ -56,210 +57,116 @@ const totalCount = posts.length;
                             </div>
                         )}
                     </div>
-                    {post.frontmatter.heroImage && post.frontmatter.heroImage !== 'none' && post.frontmatter.heroImage !== 'false' && post.frontmatter.heroImage !== 'null' && (
+                    {post.frontmatter.thumbnailImage && (
                         <a href={post.url} class="post-thumb-wrapper">
-                            <img src={post.frontmatter.heroImage} alt={post.frontmatter.title} class="post-thumb" />
+                            <img src={post.frontmatter.thumbnailImage} alt="" class="post-thumb" width="1200" height="676" loading="lazy" decoding="async" />
                         </a>
                     )}
                 </article>
             ))
         )}
-        <div id="no-results" class="empty-state" style="display: none;">검색 결과가 없습니다.</div>
+        <div class="empty-state no-results" hidden>검색 결과가 없습니다.</div>
     </div>
 
     {posts.length > 0 && (
         <div class="post-controls">
-            <input type="text" id="post-search" placeholder="글 제목, 태그 검색..." autocomplete="off" />
+            <label class="sr-only" for={instanceId}>게시글 검색</label>
+            <input type="search" id={instanceId} class="post-search" placeholder="글 제목, 태그 검색..." autocomplete="off" />
         </div>
     )}
 
-    <div class="pagination" id="pagination-container"></div>
+    <nav class="pagination" aria-label="게시글 페이지"></nav>
 </div>
 
 <script>
-    import Fuse from 'fuse.js';
+    import { renderPagination } from '../utils/pagination';
 
     const initPostList = () => {
-        const ITEMS_PER_PAGE = 5; 
-        const searchInput = document.getElementById('post-search');
-        const postItems = Array.from(document.querySelectorAll('.post-item'));
-        const paginationContainer = document.getElementById('pagination-container');
-        const noResults = document.getElementById('no-results');
+        document.querySelectorAll<HTMLElement>('[data-post-list]').forEach((wrapper) => {
+            if (wrapper.dataset.initialized === 'true') return;
+            wrapper.dataset.initialized = 'true';
+            const ITEMS_PER_PAGE = 5;
+            const searchInput = wrapper.querySelector<HTMLInputElement>('.post-search');
+            const postItems = Array.from(wrapper.querySelectorAll<HTMLElement>('.post-item'));
+            const paginationContainer = wrapper.querySelector<HTMLElement>('.pagination');
+            const noResults = wrapper.querySelector<HTMLElement>('.no-results');
+            if (!postItems.length || !paginationContainer) return;
 
-        if (!postItems.length) return; 
+            let currentPage = 1;
+            let currentSubcat = 'all';
 
-        const searchData = postItems.map(item => ({
-            element: item,
-            title: (item as HTMLElement).dataset.title || '',
-            tags: (item as HTMLElement).dataset.tags || '',
-            subcat: (item as HTMLElement).dataset.subcat || ''
-        }));
-
-        const fuse = new Fuse(searchData, {
-            keys: [
-                { name: 'title', weight: 0.7 },
-                { name: 'tags', weight: 0.3 }
-            ],
-            threshold: 0.3,
-            ignoreLocation: true
-        });
-
-        let currentPage = 1;
-        let currentSubcat = 'all';
-        let filteredItems = [...postItems];
-
-        function render() {
-            const currentSearchInput = document.getElementById('post-search') as HTMLInputElement;
-            const query = currentSearchInput ? currentSearchInput.value : '';
-
-            // 1. 텍스트 검색 및 서브 카테고리 필터링
-            let results = [...searchData];
-
-            if (currentSubcat !== 'all') {
-                results = results.filter(item => item.subcat === currentSubcat);
-            }
-
-            if (query.trim() !== '') {
-                const fuseFiltered = new Fuse(results, {
-                    keys: [
-                        { name: 'title', weight: 0.7 },
-                        { name: 'tags', weight: 0.3 }
-                    ],
-                    threshold: 0.3,
-                    ignoreLocation: true
+            const render = () => {
+                const query = searchInput?.value.trim().toLocaleLowerCase('ko') ?? '';
+                const filteredItems = postItems.filter((item) => {
+                    const inCategory = currentSubcat === 'all' || item.dataset.subcat === currentSubcat;
+                    const searchable = `${item.dataset.title ?? ''} ${item.dataset.tags ?? ''}`.toLocaleLowerCase('ko');
+                    return inCategory && (!query || searchable.includes(query));
                 });
-                results = fuseFiltered.search(query).map(r => r.item);
-            }
-
-            filteredItems = results.map(r => r.element);
-
-            // 2. 페이지네이션 계산
-            const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
-            if (currentPage > totalPages) currentPage = totalPages || 1;
-
-            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-            const endIndex = startIndex + ITEMS_PER_PAGE;
-
-            // 3. UI 업데이트
-            postItems.forEach(item => {
-                (item as HTMLElement).style.display = 'none';
-            });
-            
-            if (filteredItems.length === 0) {
-                if (noResults) noResults.style.display = 'block';
-                if (paginationContainer) paginationContainer.innerHTML = '';
-            } else {
-                if (noResults) noResults.style.display = 'none';
-                filteredItems.slice(startIndex, endIndex).forEach(item => {
-                    (item as HTMLElement).style.display = 'flex'; 
-                });
-                renderPagination(totalPages);
-            }
-        }
-
-        function renderPagination(totalPages: number) {
-            if (!paginationContainer) return;
-            if (totalPages <= 1) {
-                paginationContainer.innerHTML = '';
-                return;
-            }
-
-            let html = '';
-            html += `<button class="page-btn nav-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button>`;
-            
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
-            }
-
-            html += `<button class="page-btn nav-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>&gt;</button>`;
-            
-            paginationContainer.innerHTML = html;
-
-            paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (btn.hasAttribute('disabled')) return;
-                    currentPage = parseInt((btn as HTMLElement).dataset.page || '1');
+                const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+                currentPage = Math.min(currentPage, totalPages || 1);
+                postItems.forEach((item) => { item.style.display = 'none'; });
+                filteredItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                    .forEach((item) => { item.style.display = 'flex'; });
+                if (noResults) noResults.hidden = filteredItems.length > 0;
+                renderPagination(paginationContainer, currentPage, totalPages, (page) => {
+                    currentPage = page;
                     render();
-                    
-                    const listWrapper = document.querySelector('.lucode-post-list-wrapper');
-                    if (listWrapper) {
-                        const top = listWrapper.getBoundingClientRect().top + window.scrollY - 100;
-                        window.scrollTo({ top, behavior: 'smooth' });
-                    }
+                    window.scrollTo({ top: wrapper.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' });
                 });
-            });
-        }
+            };
 
-        if (searchInput) {
+            if (searchInput) {
             const params = new URLSearchParams(window.location.search);
             const q = params.get('q');
-            if (q && !(searchInput as HTMLInputElement).value) {
-                (searchInput as HTMLInputElement).value = q;
+                if (q && !searchInput.value) searchInput.value = q;
+                searchInput.addEventListener('input', () => { currentPage = 1; render(); });
             }
-            
-            if (!searchInput.hasAttribute('data-listener-attached')) {
-                searchInput.setAttribute('data-listener-attached', 'true');
-                searchInput.addEventListener('input', () => { 
-                    currentPage = 1; 
-                    render(); 
-                });
-            }
-        }
 
-        const subcatBtns = document.querySelectorAll('.subcat-btn');
-        subcatBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const target = e.currentTarget as HTMLElement;
-                const cat = target.dataset.subcat;
+            const subcatBtns = wrapper.querySelectorAll<HTMLButtonElement>('.subcat-btn');
+            subcatBtns.forEach((button) => button.addEventListener('click', () => {
+                const cat = button.dataset.subcat;
                 if (!cat) return;
-
-                // Update active state
-                subcatBtns.forEach(b => b.classList.remove('active'));
-                target.classList.add('active');
-
+                subcatBtns.forEach((item) => item.classList.toggle('active', item === button));
                 currentSubcat = cat;
                 currentPage = 1;
                 render();
-            });
-        });
+            }));
 
-        document.querySelectorAll('.tag-btn').forEach(btn => {
-            if (!btn.hasAttribute('data-listener-attached')) {
-                btn.setAttribute('data-listener-attached', 'true');
-                btn.addEventListener('click', (e) => {
+            wrapper.querySelectorAll<HTMLButtonElement>('.tag-btn').forEach((button) => {
+                button.addEventListener('click', (e) => {
                     e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const tag = btn.getAttribute('data-tag');
+                    const tag = button.dataset.tag;
                     if (!tag) return;
-                    
                     if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-                        const activeSearchInput = document.getElementById('post-search') as HTMLInputElement;
-                        if (activeSearchInput) {
-                            activeSearchInput.value = tag;
-                            activeSearchInput.dispatchEvent(new Event('input'));
-                            window.history.pushState({}, '', `/?q=${tag}`);
-                            
-                            const listWrapper = document.querySelector('.lucode-post-list-wrapper');
-                            if (listWrapper) {
-                                const top = listWrapper.getBoundingClientRect().top + window.scrollY - 100;
-                                window.scrollTo({ top, behavior: 'smooth' });
-                            }
-                        }
+                        if (!searchInput) return;
+                        searchInput.value = tag;
+                        currentPage = 1;
+                        window.history.replaceState({}, '', `/?q=${encodeURIComponent(tag)}`);
+                        render();
                     } else {
-                        window.location.href = `/?q=${tag}`;
+                        window.location.href = `/?q=${encodeURIComponent(tag)}`;
                     }
                 });
-            }
+            });
+            render();
         });
-
-        render();
     };
 
     document.addEventListener('astro:page-load', initPostList);
 </script>
 
 <style>
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
     .subcategory-filter {
         display: flex;
         gap: 0.35rem; /* Slightly tighter gap since prefix is gone */
@@ -349,9 +256,9 @@ const totalCount = posts.length;
         position: relative;
         display: none; 
         flex-direction: row;
-        align-items: center; 
+        align-items: flex-start;
         justify-content: space-between;
-        gap: 1.5rem;
+        gap: clamp(1rem, 3vw, 1.5rem);
         padding: 1.5rem 0; 
         margin: 0;
         border-bottom: 1px solid var(--border-color);
@@ -363,7 +270,7 @@ const totalCount = posts.length;
     }
 
     .post-content-wrapper {
-        flex: 1;
+        flex: 1 1 72%;
         min-width: 0;
         display: flex;
         flex-direction: column;
@@ -386,9 +293,10 @@ const totalCount = posts.length;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
-        width: 160px;
-        height: 100px;
+        flex: 0 1 28%;
+        width: 140px;
+        max-width: 140px;
+        aspect-ratio: 16 / 10;
         margin: 0;
         border-radius: var(--radius);
         overflow: hidden;
@@ -440,9 +348,11 @@ const totalCount = posts.length;
         display: flex;
         gap: 0.5rem;
         margin-top: 0.25rem;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        overflow: hidden;
     }
     .tag {
+        flex-shrink: 0;
         font-family: var(--font-mono);
         font-size: var(--font-size-tag);
         color: var(--signature-color);
@@ -460,11 +370,13 @@ const totalCount = posts.length;
 
     @media (max-width: 600px) {
         .post-item {
-            gap: 1rem;
+            gap: 0.75rem;
         }
         .post-thumb-wrapper {
-            width: 100px;
-            height: 80px;
+            flex-basis: 88px;
+            width: 88px;
+            max-width: 88px;
+            aspect-ratio: 4 / 3;
         }
         .post-title {
             font-size: 1.1rem;
@@ -477,6 +389,12 @@ const totalCount = posts.length;
         .tag {
             font-size: 0.7rem;
             padding: 0.1rem 0.4rem;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .post-thumb-wrapper {
+            display: none;
         }
     }
 </style>

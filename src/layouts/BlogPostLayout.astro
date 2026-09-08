@@ -2,41 +2,34 @@
 import BlogLayout from './BlogLayout.astro';
 import PostList from '../components/PostList.astro';
 import GiscusComments from '../components/GiscusComments.astro';
-import { categories } from '../pages/_categories';
+import { getCollection } from 'astro:content';
+import { collectionEntryToPost, getCategoryPath, isPublishedPost, normalizePath, sortPostsByDate } from '../utils/posts';
 
 const { frontmatter, headings } = Astro.props;
+const heroImage = frontmatter.heroImage && !['none', 'false', 'null'].includes(String(frontmatter.heroImage).toLowerCase())
+    ? frontmatter.heroImage
+    : undefined;
 
-// 모든 카테고리 경로 평탄화 (끝의 슬래시 제거하여 통일)
-const allCategoryPaths = categories
-    .filter(c => c.type === 'folder')
-    .flatMap(c => (c as any).items ? (c as any).items.map((item: any) => item.path.replace(/\/$/, '')) : []);
-
-function getCategoryPathFromUrl(url: string | undefined) {
-    if (!url) return null;
-    const normalizedUrl = url.replace(/\/$/, '');
-    return allCategoryPaths
-        .filter(catPath => normalizedUrl.startsWith(catPath))
-        .sort((a, b) => b.length - a.length)[0] || null;
+if (import.meta.env.PROD && frontmatter.draft) {
+    return Astro.redirect('/404');
 }
 
 // 같은 카테고리의 포스트들을 불러오기
-const allPosts = Object.values(import.meta.glob('../pages/**/*.md', { eager: true })) as any[];
-const currentPath = Astro.url.pathname.replace(/\/$/, '');
-const currentCategoryPath = getCategoryPathFromUrl(currentPath);
+const allPosts = (await getCollection('posts')).map(collectionEntryToPost);
+const currentPath = normalizePath(Astro.url.pathname);
+const currentCategoryPath = getCategoryPath(currentPath);
 
-const categoryPosts = allPosts.filter(post => {
-    const fileName = post.file.split('/').pop();
-    if (fileName.startsWith('_') || post.frontmatter.isCategory || post.frontmatter.hide) return false;
-    if (currentPath === post.url || currentPath === post.url + '/') return false;
-
-    const postCategoryPath = getCategoryPathFromUrl(post.url);    return postCategoryPath && currentCategoryPath && postCategoryPath === currentCategoryPath;
-})
-.sort((a, b) => new Date(b.frontmatter.date || 0).valueOf() - new Date(a.frontmatter.date || 0).valueOf());
+const categoryPosts = sortPostsByDate(allPosts.filter((post) =>
+    isPublishedPost(post)
+    && currentCategoryPath !== null
+    && normalizePath(post.url) !== currentPath
+    && getCategoryPath(post.url) === currentCategoryPath,
+));
 ---
-<BlogLayout title={`${frontmatter.title} | Studio.lib`} description={frontmatter.description} headings={headings}>
-    <article class="sl-markdown-content">
+<BlogLayout title={`${frontmatter.title} | Studio.lib`} description={frontmatter.description} headings={headings} pageType="article" image={heroImage}>
+    <article class="blog-post">
         <header class="post-header">
-            <h1 id="_top">{frontmatter.title}</h1>
+            <h1 id="_top" class="post-heading">{frontmatter.title}</h1>
             {frontmatter.hide && <span class="hide-label">HIDDEN</span>}
             <div class="post-meta">
                 <span>{frontmatter.date}</span>
@@ -46,18 +39,21 @@ const categoryPosts = allPosts.filter(post => {
             </div>
         </header>
         
-        <div class="post-content">
+        <div class="post-content sl-markdown-content">
+            {heroImage && (
+                <img class="hero-image" src={heroImage} alt="" width="1200" height="676" decoding="async" fetchpriority="high" />
+            )}
             <slot />
         </div>
 
         <div class="comments-section">
-            <h2 id="comments">Comments</h2>
+            <h2 id="comments" class="post-section-heading">Comments</h2>
             <GiscusComments />
         </div>
 
         {categoryPosts.length > 0 && (
             <div class="category-posts-section">
-                <h2 id="more-posts">More Posts</h2>
+                <h2 id="more-posts" class="post-section-heading">More Posts</h2>
                 <PostList posts={categoryPosts} />
             </div>
         )}
@@ -67,6 +63,16 @@ const categoryPosts = allPosts.filter(post => {
 <style>
     /* Layout specific styles for blog posts */
     .post-header { margin-bottom: 3rem; position: relative; }
+    .post-heading {
+        margin: 0;
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: var(--font-size-h1);
+        font-weight: var(--weight-semibold);
+        line-height: var(--leading-tight);
+        letter-spacing: var(--tracking-tight);
+        overflow-wrap: break-word;
+    }
     .hide-label {
         display: inline-block;
         background-color: #ffeb3b;
@@ -92,7 +98,20 @@ const categoryPosts = allPosts.filter(post => {
         margin-top: 0.5rem;
         padding-top: 0.5rem;
     }
-    #more-posts {
-        margin-bottom: 0rem;
+    .post-section-heading {
+        margin: 2.75rem 0 1rem;
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: var(--font-size-h2);
+        font-weight: var(--weight-semibold);
+        line-height: var(--leading-snug);
+        letter-spacing: var(--tracking-tight);
+    }
+    .hero-image {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1200 / 676;
+        object-fit: cover;
+        border-radius: var(--radius);
     }
 </style>

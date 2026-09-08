@@ -4,7 +4,7 @@ import { categories } from '../pages/_categories';
 // src/components/BlogSidebar.astro
 ---
 
-<aside class="lucode-sidebar" transition:persist="sidebar" transition:name="sidebar-container">
+<aside class="lucode-sidebar" transition:persist="sidebar">
     <nav class="lucode-sidebar-nav">
         <!-- Personal Space: Lo-fi / Anime Vibes -->
         <div class="personal-space">
@@ -12,7 +12,7 @@ import { categories } from '../pages/_categories';
             
             <!-- Anime Profile Box -->
             <div class="nature-box">
-                <div class="nature-image" style="background-image: url('https://i.pinimg.com/1200x/98/90/4e/98904e5111b35f7cecaeefe80ba51837.jpg');"></div>
+                <img class="nature-image" src="/images/sidebar-profile.svg" alt="" width="720" height="360" loading="eager" />
                 <div class="nature-overlay">
                     <span class="location-tag">Seol_11</span>
                     <span class="status-tag">STATUS: ONLINE</span>
@@ -39,7 +39,7 @@ import { categories } from '../pages/_categories';
                             </div>
                         </div>
                     </div>
-                    <button class="anim-toggle" id="music-anim-toggle" title="Toggle Animation">
+                    <button class="anim-toggle" id="music-anim-toggle" type="button" title="애니메이션 전환" aria-label="음악 위젯 애니메이션 전환" aria-pressed="false">
                         <div class="toggle-dot"></div>
                     </button>
                 </div>
@@ -53,11 +53,13 @@ import { categories } from '../pages/_categories';
         <div class="group-title">CATEGORIES</div>
         <!-- Categories -->
         {categories.map(category => {
-            if (category.type === 'folder' || category.type === 'category') {
+            if (category.type === 'folder') {
                 return (
                     <div class="category-folder" data-folder-id={category.id || category.title}>
-                        <div class="sidebar-group-title">{category.title}</div>
-                        <div class="folder-content">
+                        <button class="sidebar-group-title" type="button" aria-expanded="true" aria-controls={`folder-${category.id}`}>
+                            {category.title}
+                        </button>
+                        <div class="folder-content" id={`folder-${category.id}`}>
                             <ul class="sidebar-list">
                                 {category.items && category.items.map(item => (
                                     <li>
@@ -84,8 +86,11 @@ import { categories } from '../pages/_categories';
 </aside>
 
 <script>
-    const initSidebar = () => {
-        const folders = document.querySelectorAll('.category-folder');
+    const bindSidebar = (sidebar: HTMLElement) => {
+        if (sidebar.dataset.initialized === 'true') return;
+        sidebar.dataset.initialized = 'true';
+
+        const folders = sidebar.querySelectorAll('.category-folder');
         folders.forEach(folder => {
             const id = folder.getAttribute('data-folder-id');
             if (!id) return;
@@ -97,48 +102,65 @@ import { categories } from '../pages/_categories';
                 folder.classList.add('is-open'); // 기본값은 열림
             }
 
-            const titleBtn = folder.querySelector('.sidebar-group-title');
-            if (titleBtn && !titleBtn.hasAttribute('data-listener-attached')) {
-                titleBtn.setAttribute('data-listener-attached', 'true');
+            const titleBtn = folder.querySelector<HTMLButtonElement>('.sidebar-group-title');
+            if (titleBtn) {
+                titleBtn.setAttribute('aria-expanded', String(folder.classList.contains('is-open')));
                 titleBtn.addEventListener('click', () => {
-                    folder.classList.toggle('is-open');
-                    setTimeout(() => {
-                        localStorage.setItem(`folder-state-${id}`, folder.classList.contains('is-open') ? 'open' : 'closed');
-                    }, 50);
+                    const isOpen = folder.classList.toggle('is-open');
+                    titleBtn.setAttribute('aria-expanded', String(isOpen));
+                    localStorage.setItem(`folder-state-${id}`, isOpen ? 'open' : 'closed');
                 });
             }
         });
 
-        const currentPath = window.location.pathname;
-        const normalizedCurrentPath = currentPath.endsWith('/') ? currentPath : currentPath + '/';
-        const links = document.querySelectorAll('.sidebar-link');
-        
-        links.forEach(link => {
-            const href = link.getAttribute('href') || '/';
-            const normalizedHref = href.endsWith('/') ? href : href + '/';
-            
-            link.classList.remove('active');
-            if (normalizedHref === normalizedCurrentPath || (normalizedHref !== '/' && normalizedCurrentPath.startsWith(normalizedHref))) {
-                link.classList.add('active');
-            }
+        sidebar.querySelectorAll<HTMLAnchorElement>('.sidebar-link').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (!window.matchMedia('(max-width: 1024px)').matches) return;
+                sidebar.classList.remove('mobile-open');
+                const menuButton = document.getElementById('mobile-menu-btn');
+                menuButton?.setAttribute('aria-expanded', 'false');
+            });
         });
 
         // Music Widget Animation Toggle
-        const musicWidget = document.getElementById('music-widget');
-        const animToggle = document.getElementById('music-anim-toggle');
+        const musicWidget = sidebar.querySelector<HTMLElement>('#music-widget');
+        const animToggle = sidebar.querySelector<HTMLButtonElement>('#music-anim-toggle');
         
         if (musicWidget && animToggle) {
             const isPaused = localStorage.getItem('music-anim-paused') === 'true';
             if (isPaused) musicWidget.classList.add('paused');
+            animToggle.setAttribute('aria-pressed', String(isPaused));
 
-            if (!animToggle.hasAttribute('data-listener-attached')) {
-                animToggle.setAttribute('data-listener-attached', 'true');
-                animToggle.addEventListener('click', () => {
-                    const nowPaused = musicWidget.classList.toggle('paused');
-                    localStorage.setItem('music-anim-paused', nowPaused);
-                });
-            }
+            animToggle.addEventListener('click', () => {
+                const nowPaused = musicWidget.classList.toggle('paused');
+                animToggle.setAttribute('aria-pressed', String(nowPaused));
+                localStorage.setItem('music-anim-paused', String(nowPaused));
+            });
         }
+
+    };
+
+    const updateActiveSidebarLink = (sidebar: HTMLElement) => {
+        const currentPath = window.location.pathname;
+        const normalizedCurrentPath = currentPath.endsWith('/') ? currentPath : `${currentPath}/`;
+
+        sidebar.querySelectorAll<HTMLAnchorElement>('.sidebar-link').forEach(link => {
+            const normalizedHref = link.pathname.endsWith('/') ? link.pathname : `${link.pathname}/`;
+            const isActive = normalizedHref === normalizedCurrentPath
+                || (normalizedHref !== '/' && normalizedCurrentPath.startsWith(normalizedHref));
+
+            link.classList.toggle('active', isActive);
+            if (isActive) link.setAttribute('aria-current', 'page');
+            else link.removeAttribute('aria-current');
+        });
+    };
+
+    const initSidebar = () => {
+        const sidebar = document.querySelector<HTMLElement>('.lucode-sidebar');
+        if (!sidebar) return;
+
+        bindSidebar(sidebar);
+        updateActiveSidebarLink(sidebar);
     };
 
     document.addEventListener('astro:page-load', initSidebar);
@@ -200,10 +222,10 @@ import { categories } from '../pages/_categories';
         border: 1px solid var(--border-color);
     }
     .nature-image {
+        display: block;
         width: 100%;
         height: 100%;
-        background-size: cover;
-        background-position: center;
+        object-fit: cover;
         filter: saturate(0.8) contrast(0.9);
         transition: transform 0.6s ease;
     }
@@ -367,6 +389,11 @@ import { categories } from '../pages/_categories';
     }
 
     .sidebar-group-title {
+        width: 100%;
+        background: none;
+        border: 0;
+        font-family: inherit;
+        text-align: left;
         font-size: var(--font-size-sidebar);
         font-weight: 600;
         color: var(--foreground);
@@ -397,7 +424,7 @@ import { categories } from '../pages/_categories';
         display: none;
         margin-top: 0.25rem; 
     }
-    
+
     .category-folder.is-open .folder-content {
         display: block;
     }

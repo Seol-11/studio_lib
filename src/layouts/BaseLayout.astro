@@ -3,22 +3,43 @@
 import { ClientRouter } from 'astro:transitions';
 import LogWidget from '../components/LogWidget.astro';
 import '../styles/style_config.css';
+import { SITE } from '../config/site';
 
 export interface Props {
     title?: string;
     description?: string;
+    robots?: string;
+    pageType?: 'website' | 'article';
+    image?: string;
 }
 
 const { 
-    title = "Studio.lib | System Router",
-    description = "Hardware architectures and Digital Logic Portfolio"
+    title = SITE.title,
+    description = SITE.description,
+    robots = 'index, follow',
+    pageType = 'website',
+    image = '/images/sidebar-profile.svg',
 } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const socialImageUrl = new URL(image, Astro.site);
 ---
 <!DOCTYPE html> <html lang="ko">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <meta name="generator" content={Astro.generator} />
+    <meta property="og:type" content={pageType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:locale" content="ko_KR" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" type="application/rss+xml" title="Studio.lib RSS" href="/rss.xml" />
     <title>{title}</title>
 
     <script is:inline>
@@ -50,12 +71,13 @@ const {
     <script>
         const setupMarkdown = () => {
             // Table responsive wrapper
-            const tables = document.querySelectorAll('.sl-markdown-content table');
+            const tables = document.querySelectorAll<HTMLTableElement>('.sl-markdown-content table');
             tables.forEach(table => {
-                if (table.parentElement.classList.contains('table-wrapper')) return;
+                const parent = table.parentElement;
+                if (!parent || parent.classList.contains('table-wrapper')) return;
                 const wrapper = document.createElement('div');
                 wrapper.className = 'table-wrapper';
-                table.parentNode.insertBefore(wrapper, table);
+                parent.insertBefore(wrapper, table);
                 wrapper.appendChild(table);
             });
         };

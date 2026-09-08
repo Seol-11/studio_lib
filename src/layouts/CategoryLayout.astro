@@ -1,37 +1,23 @@
 ---
 import BlogLayout from './BlogLayout.astro';
 import PostList from '../components/PostList.astro';
-import { categories } from '../pages/_categories';
+import { getCollection } from 'astro:content';
+import { collectionEntryToPost, getCategoryPath, isPublishedPost, normalizePath, sortPostsByDate } from '../utils/posts';
 
 const { frontmatter } = Astro.props;
 
-// 모든 카테고리 경로 평탄화 (끝의 슬래시 제거하여 통일)
-const allCategoryPaths = categories
-    .filter(c => c.type === 'folder')
-    .flatMap(c => (c as any).items ? (c as any).items.map((item: any) => item.path.replace(/\/$/, '')) : []);
-
-function getCategoryPathFromUrl(url: string | undefined) {
-    if (!url) return null;
-    const normalizedUrl = url.replace(/\/$/, '');
-    // 가장 길게 일치하는 경로 찾기
-    return allCategoryPaths
-        .filter(catPath => normalizedUrl.startsWith(catPath))
-        .sort((a, b) => b.length - a.length)[0] || null;
-}
-
 // 이 카테고리 페이지의 경로
-const currentPath = Astro.url.pathname.replace(/\/$/, '');
-const currentCategoryPath = getCategoryPathFromUrl(currentPath) || currentPath;
+const currentPath = normalizePath(Astro.url.pathname);
+const currentCategoryPath = getCategoryPath(currentPath) || currentPath;
 
 // 모든 블로그 포스트 가져오기
-const allPosts = Object.values(import.meta.glob('../pages/**/*.md', { eager: true })) as any[];
+const allPosts = (await getCollection('posts')).map(collectionEntryToPost);
 
 // 메인 화면용, 카테고리용 md 파일 제외, 그리고 이 카테고리에 맞는 포스트만 필터링
 const posts = allPosts.filter(post => {
-    const fileName = post.file.split('/').pop();
-    if (fileName.startsWith('_') || post.frontmatter.isCategory || post.frontmatter.hide) return false;
-
-    const postCategoryPath = getCategoryPathFromUrl(post.url);    if (!postCategoryPath) return false;
+    if (!isPublishedPost(post)) return false;
+    const postCategoryPath = getCategoryPath(post.url);
+    if (!postCategoryPath) return false;
     
     return postCategoryPath === currentCategoryPath;
 }).map(post => {
@@ -56,21 +42,17 @@ const posts = allPosts.filter(post => {
 const subCategories = Array.from(new Set(posts.map(p => p.subCategory).filter(Boolean))) as string[];
 
 // 최신순 정렬
-const sortedPosts = posts.sort((a, b) => {
-    const dateA = new Date(a.frontmatter.date || 0).getTime();
-    const dateB = new Date(b.frontmatter.date || 0).getTime();
-    return dateB - dateA;
-});
+const sortedPosts = sortPostsByDate(posts);
 ---
 
 <BlogLayout title={`${frontmatter.title} | Studio.lib`} description={frontmatter.description}>
-    <div class="sl-markdown-content">
+    <div>
         <header class="category-header">
             <h1 class="category-title" id="_top">{frontmatter.title}</h1>
             {frontmatter.description && <p class="category-meta">{frontmatter.description}</p>}
         </header>
         
-        <div class="category-intro-content">
+        <div class="category-intro-content sl-markdown-content">
             <slot />
         </div>
 

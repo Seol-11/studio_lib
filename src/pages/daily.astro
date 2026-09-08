@@ -5,7 +5,7 @@ import GiscusComments from '../components/GiscusComments.astro';
 ---
 
 <BlogLayout title="Daily Log | Studio.lib">
-    <div class="sl-markdown-content">
+    <div>
         <header class="category-header">
             <h1 class="category-title" id="_top">Daily Log</h1>
             <p class="category-meta">하루 한 줄, 시스템 로그처럼 남기는 짧은 생각들</p>
@@ -20,7 +20,7 @@ import GiscusComments from '../components/GiscusComments.astro';
                             <div class="log-line"></div>
                         </div>
                         <div class="log-header">
-                            <span class="log-date">{log.date}</span>
+                            <time class="log-date" datetime={log.date}>{log.date}</time>
                             <span class="log-preview">{log.content}</span>
                         </div>
                     </summary>
@@ -33,7 +33,7 @@ import GiscusComments from '../components/GiscusComments.astro';
             ))}
         </div>
 
-        <div id="log-pagination" class="pagination"></div>
+        <nav id="log-pagination" class="pagination" aria-label="일상 로그 페이지"></nav>
 
         <div class="category-posts-section comments-section">
             <h2 id="guestbook" class="guestbook-heading">Guestbook</h2>
@@ -43,9 +43,11 @@ import GiscusComments from '../components/GiscusComments.astro';
 </BlogLayout>
 
 <script>
+    import { renderPagination } from '../utils/pagination';
+
     const initDailyLog = () => {
         const ITEMS_PER_PAGE = 10;
-        const logItems = Array.from(document.querySelectorAll('.log-item'));
+        const logItems = Array.from(document.querySelectorAll<HTMLElement>('.log-item'));
         const paginationContainer = document.getElementById('log-pagination');
         let currentPage = 1;
 
@@ -64,35 +66,13 @@ import GiscusComments from '../components/GiscusComments.astro';
                 }
             });
 
-            renderPagination(totalPages);
-        }
-
-        function renderPagination(totalPages) {
-            if (!paginationContainer) return;
-            if (totalPages <= 1) {
-                paginationContainer.innerHTML = '';
-                return;
-            }
-
-            let html = '';
-            html += `<button class="page-btn nav-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>&lt;</button>`;
-            
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
-            }
-
-            html += `<button class="page-btn nav-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>&gt;</button>`;
-            
-            paginationContainer.innerHTML = html;
-
-            paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (btn.hasAttribute('disabled')) return;
-                    currentPage = parseInt(btn.dataset.page);
+            if (paginationContainer) {
+                renderPagination(paginationContainer, currentPage, totalPages, (page) => {
+                    currentPage = page;
                     render();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
-            });
+            }
         }
 
         render();
