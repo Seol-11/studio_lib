@@ -37,7 +37,7 @@ JSON에서는 마지막 항목 뒤에 쉼표를 붙이지 않습니다.
 - 사이드바 카테고리: `src/pages/_categories.ts`
 - About 내용: `src/pages/_about.md`
 - 홈 소개 문구: `src/pages/_blog-index.md`
-- 사이드바 프로필 이미지: `public/images/sidebar-profile.svg`
+- 사이드바 프로필 이미지: `public/images/sidebar-profile.jpg`
 
 ## 공개 전 최소 체크
 
